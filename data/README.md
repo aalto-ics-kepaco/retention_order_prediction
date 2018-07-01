@@ -1,0 +1,3 @@
+* **raw**: raw data, e.g. extracted from the PredRet DB
+* **processed**: pre-processed data, e.g. aggregated, cleaned small rts, etc...
+* **scripts**: scripts for the data pre-processing

@@ -1,0 +1,187 @@
+---
+title: "PredRet_v2"
+author: "Eric Bach"
+date: "December 16, 2017"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library (ggplot2)
+library (data.table)
+library (shiny)
+```
+
+## PredRet v2: Pre-processing of the RT data
+
+Script to pre-process the Aug16 PredRet data:
+
+* Consider only reversed phase columns
+* Consider only datasets included in the publication
+* Early eluting molecules are excluded
+* Minimum retention time rather than average for multiple RTs
+* Consistency check for the itendification, e.g. RT difference to large
+
+### Read and plot the RT data
+```{r}
+base_dir <- stop ("DEFINE BASE-PATH CONTAINING INPUT DATA!") 
+# Eg: base_dir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/data"
+raw_data_dir <- paste (base_dir, "/raw/PredRet/", sep = "/")
+
+db <- data.table (read.csv (
+    paste (raw_data_dir, "Stanstrup_exp_Aug16.csv", sep = "/"),
+    sep = ";"))
+setkey (db, "system")
+
+# Consider only reversed phase columns
+reversed <- c("LIFE_old", "LIFE_new", "FEM_long", "FEM_short",
+              "FEM_orbitrap_plasma", "FEM_orbitrap_urine", "FEM_lipids",
+              "IPB_Halle", "RIKEN", "Eawag_XBridgeC18", "MPI_Symmetry",
+              "MTBLS4", "MTBLS17", "MTBLS19", "MTBLS20", "MTBLS36",
+              "MTBLS38", "MTBLS39", "UFZ_Phenomenex", "UniToyama_Atlantis",
+              "MTBLS52")
+db <- db[reversed]
+
+# Consider only datasets included in the publication
+db <- db[as.POSIXlt.date(db$date.added) <= as.POSIXlt.date("2015-06-18"), ]
+
+# Exclude measurements which are flagged as suspected
+db <- db[suspect == FALSE]
+```
+
+```{r, echo=FALSE, fig.width=9, fig.align="center", eval=FALSE}
+ggplot (db, aes (x = recorded_rt)) + 
+    geom_histogram (binwidth = 1) + 
+    facet_wrap (~ system, scales = "free_y") +
+    xlab ("Retention time") + ylab ("Number of measurements")
+```
+The datasets (partially representing different chromatographic columns) cover 
+very different retention time ranges, i.e. run-time of the columns. For each 
+dataset a seperate RT threshold can be defined to exclude early eluting molecules. 
+
+```{r, echo=FALSE, fig.width=9, fig.align="center", eval=FALSE}
+ggplot (db, aes (x = recorded_rt)) + 
+    geom_histogram (bins = 30) + 
+    facet_wrap (~ system, scales = "free") +
+    xlab ("Retention time") + ylab ("Number of measurements")
+```
+
+### Remove early eluting molecules
+
+The removal of early eluting molecules is currently done individually for each 
+dataset and performed manually. Large peaks in the begining, i.e. at low RTs, 
+correspond to the molecules that do not interact with the chromatographic system.
+
+We therefore inspect each dataset separetly at the beginning:
+
+```{r, eval=TRUE, echo=FALSE}
+selectInput ("dataset", label = "Dataset:", choices = reversed)
+
+renderPlot ({ 
+    ggplot (db[input$dataset], aes (x = recorded_rt)) + 
+        geom_histogram (bins = 70) +
+        scale_x_continuous (breaks = scales::pretty_breaks (n = 30))
+})
+```
+
+```{r, eval=TRUE, echo=FALSE}
+# db_rtthr <- data.table (system = reversed, rtthr = 0.0)
+# setkey (db_rtthr, "system")
+
+setkey (db, "system")
+db$rtthr <- 0.0
+db["LIFE_old"]$rtthr <- 0.6
+db["LIFE_new"]$rtthr <- 0.6
+db["FEM_long"]$rtthr <- 3.0
+db["FEM_short"]$rtthr <- 0.0
+db["FEM_orbitrap_plasma"]$rtthr <- 2.0
+db["FEM_orbitrap_urine"]$rtthr <- 0.0
+db["FEM_lipids"]$rtthr <- 1.0
+db["IPB_Halle"]$rtthr <- 0.9
+db["RIKEN"]$rtthr <- 0.3
+db["Eawag_XBridgeC18"]$rtthr <- 1.5
+db["MPI_Symmetry"]$rtthr <- 1.5
+db["MTBLS4"]$rtthr <- 0.0
+db["MTBLS17"]$rtthr <- 0.5
+db["MTBLS19"]$rtthr <- 1.0
+db["MTBLS20"]$rtthr <- 1.25
+db["MTBLS36"]$rtthr <- 1.75
+db["MTBLS38"]$rtthr <- 1.75
+db["MTBLS39"]$rtthr <- 2.5
+db["UFZ_Phenomenex"]$rtthr <- 2.5
+db["UniToyama_Atlantis"]$rtthr <- 0.0
+db["MTBLS52"]$rtthr <- 0.0
+
+# db_rtmax <- db[, .(rt_max = max (recorded_rt)), by = "system"]
+# setkey (db_rtmax, "system")
+
+# stopifnot (all (db_rtmax$system == db_rtthr$system))
+
+# db_rtthr$rtthr_p <- db_rtthr$rtthr / db_rtmax$rt_max * 100
+
+renderTable ({
+    db[, .(rtthr = unique (rtthr)), by = "system"]
+}) 
+```
+
+```{r,eval=TRUE}
+# Early eluting molecules are excluded
+db_early <- db[recorded_rt >= rtthr]
+```
+
+```{r, eval=TRUE, echo=FALSE}
+selectInput ("dataset", label = "Dataset:", choices = reversed)
+
+renderPlot ({ 
+    ggplot (db_early[input$dataset], aes (x = recorded_rt)) + 
+        geom_histogram (bins = 70) +
+        scale_x_continuous (breaks = scales::pretty_breaks (n = 30))
+})
+```
+
+### Aggregating multiple RT measurements
+
+```{r, eval = TRUE}
+# Minimum retention time rather than average for multiple RTs
+db_agg <- db_early[, 
+    .(rt        = min (recorded_rt), 
+      rt_diff   = max (recorded_rt) - min (recorded_rt), 
+      rt_diff_p = (max (recorded_rt) - min (recorded_rt)) / 
+          min (recorded_rt) * 100,
+      n_rep     = .N), 
+    by = c("inchi", "system")]
+```
+
+Number of molecules per system after aggregation
+```{r, eval=TRUE, echo=FALSE}
+renderTable({db_agg[, .N, by = c("system")]})
+```
+
+### Remove incosistend identifications
+```{r, eval=TRUE}
+# Consistency check for the itendification, e.g. RT difference to large
+db_agg_cons <- db_agg[n_rep == 1 | rt_diff_p <= 5]
+```
+
+```{r, echo=FALSE}
+renderTable({db_agg_cons[, .N, by = c("system")]})
+```
+
+```{r, echo=FALSE, fig.width=9, fig.align="center", eval=FALSE}
+ggplot (db_agg_cons, aes (x = rt)) + 
+    geom_histogram (bins = 30) + 
+    facet_wrap (~ system, scales = "free") +
+    xlab ("Retention time") + ylab ("Number of measurements")
+```
+
+## Write out pre-processed dataset
+```{r, echo=TRUE, eval=FALSE}
+out_dir <- paste (base_dir, "/processed/PredRet/v2/", sep = "/")
+write.csv (db_agg_cons[, .(inchi, rt, system)],
+           file = paste (out_dir, "rts.csv", sep = "/"),
+           row.names = FALSE, quote = TRUE)
+write.table (db_agg_cons[, .N, by = c("system")],
+             file = paste (out_dir, "mol_per_system.csv", sep = "/"),
+             row.names = FALSE, quote = FALSE, sep = "\t")
+```
