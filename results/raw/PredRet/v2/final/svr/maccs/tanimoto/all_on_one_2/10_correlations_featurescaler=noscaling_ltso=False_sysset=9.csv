@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+MTBLS4	FEM_lipids;LIFE_new;LIFE_old;MTBLS20	0.3160	0.2362	0.4102	0.2830

@@ -1,0 +1,2 @@
+target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
+FEM_short	FEM_orbitrap_urine;Eawag_XBridgeC18	0.0000	0.0000	366.9920	17.0000	-1.0000	135.7520	12.1829	0.0000	0.0000	0.8279	0.0000	0.0000	0.4518	0.4518

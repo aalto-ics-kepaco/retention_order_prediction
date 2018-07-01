@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+Eawag_XBridgeC18	FEM_orbitrap_urine;UFZ_Phenomenex	0.3767	0.1115	0.5039	0.1411

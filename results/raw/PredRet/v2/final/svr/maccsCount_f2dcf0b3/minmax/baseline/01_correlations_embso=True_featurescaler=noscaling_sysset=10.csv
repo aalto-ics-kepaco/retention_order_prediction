@@ -1,0 +1,6 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_long	Eawag_XBridgeC18	0.6089	0.0733	0.7952	0.0776
+FEM_long	FEM_long	0.8082	0.0636	0.9227	0.0472
+FEM_long	RIKEN	0.6545	0.0956	0.8041	0.0990
+FEM_long	UFZ_Phenomenex	0.5921	0.0857	0.7690	0.0873
+FEM_long	LIFE_old	0.6794	0.0845	0.8283	0.0830

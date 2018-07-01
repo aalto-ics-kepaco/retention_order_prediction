@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+MTBLS19	LIFE_old;LIFE_new;FEM_long;FEM_short;FEM_orbitrap_plasma;FEM_orbitrap_urine;IPB_Halle;RIKEN;Eawag_XBridgeC18;MPI_Symmetry;MTBLS4;MTBLS17;MTBLS20;MTBLS36;MTBLS38;MTBLS39;UFZ_Phenomenex;UniToyama_Atlantis;MTBLS52;FEM_lipids	0.5190	0.1390

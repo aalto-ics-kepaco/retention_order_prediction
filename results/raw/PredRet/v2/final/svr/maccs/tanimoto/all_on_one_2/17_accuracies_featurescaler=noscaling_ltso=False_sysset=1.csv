@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+UFZ_Phenomenex	FEM_long;FEM_short;FEM_orbitrap_plasma;FEM_orbitrap_urine	0.6328	0.0789

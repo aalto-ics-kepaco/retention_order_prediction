@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+UFZ_Phenomenex	UFZ_Phenomenex	0.5513	0.1091	0.7218	0.1174

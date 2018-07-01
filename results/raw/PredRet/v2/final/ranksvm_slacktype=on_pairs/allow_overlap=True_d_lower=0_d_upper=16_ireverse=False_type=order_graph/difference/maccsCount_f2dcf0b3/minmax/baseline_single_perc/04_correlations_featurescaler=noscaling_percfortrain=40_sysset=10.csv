@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+LIFE_old	LIFE_old	0.6299	0.1479	0.7718	0.1447

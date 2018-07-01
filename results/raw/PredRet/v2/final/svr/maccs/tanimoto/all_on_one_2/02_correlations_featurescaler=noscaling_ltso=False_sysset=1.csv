@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_long	FEM_long;FEM_short;FEM_orbitrap_plasma;FEM_orbitrap_urine	0.6311	0.0717	0.7945	0.0747

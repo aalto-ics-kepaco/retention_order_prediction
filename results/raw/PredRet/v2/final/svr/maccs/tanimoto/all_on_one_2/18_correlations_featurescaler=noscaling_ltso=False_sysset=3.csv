@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+UniToyama_Atlantis	RIKEN;LIFE_old;MTBLS52	0.2976	0.2113	0.4096	0.2559

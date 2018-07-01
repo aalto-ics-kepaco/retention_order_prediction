@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+LIFE_old	LIFE_new;LIFE_old;IPB_Halle;FEM_lipids	0.7497	0.0778

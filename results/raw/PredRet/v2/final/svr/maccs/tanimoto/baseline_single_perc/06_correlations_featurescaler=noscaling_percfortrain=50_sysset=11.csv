@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+MPI_Symmetry	MPI_Symmetry	0.3743	0.2224	0.5103	0.2714

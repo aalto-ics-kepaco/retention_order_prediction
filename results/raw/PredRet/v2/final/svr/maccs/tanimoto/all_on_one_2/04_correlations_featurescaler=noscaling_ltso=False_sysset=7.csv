@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_orbitrap_plasma	FEM_orbitrap_urine;UFZ_Phenomenex	0.3028	0.3015	0.4131	0.3791

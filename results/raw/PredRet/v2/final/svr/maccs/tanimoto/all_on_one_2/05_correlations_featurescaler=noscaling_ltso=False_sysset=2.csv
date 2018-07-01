@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_orbitrap_urine	IPB_Halle;LIFE_new;MTBLS36;MTBLS38	0.4374	0.1743	0.5556	0.2080

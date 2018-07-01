@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+MTBLS38	MTBLS39;MTBLS52;MTBLS17;MTBLS19;MTBLS4;MTBLS38;MPI_Symmetry	0.4091	0.1860	0.5455	0.2212

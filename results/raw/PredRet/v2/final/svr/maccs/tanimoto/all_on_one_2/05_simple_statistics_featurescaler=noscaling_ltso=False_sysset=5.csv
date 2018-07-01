@@ -1,0 +1,2 @@
+target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
+FEM_orbitrap_urine	RIKEN;LIFE_new;MTBLS20;FEM_long	0.0000	0.0000	535.2240	13.0000	-1.0000	77.6960	22.2313	0.0000	0.0000	1.5957	0.0000	0.0000	0.5115	0.5115

@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_lipids	LIFE_new;LIFE_old;IPB_Halle;FEM_lipids	0.5938	0.1280	0.7170	0.1349

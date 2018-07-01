@@ -1,0 +1,31 @@
+# Accept the following parameters
+# - sysset
+# - percfortrain
+
+SOURCE_ACC=$(wildcard [0-9]*_accuracies*_percfortrain=$(PERC)_sysset=$(SYSSET).csv)
+SOURCE_COR=$(wildcard [0-9]*_correlations*_percfortrain=$(PERC)_sysset=$(SYSSET).csv)
+SOURCE_GSBP=$(wildcard [0-9]*_grid_search_best_params*_percfortrain=$(PERC)_sysset=$(SYSSET).csv)
+SOURCE_GSR=$(wildcard [0-9]*_grid_search_results*_percfortrain=$(PERC)_sysset=$(SYSSET).csv)
+SOURCE_SS=$(wildcard [0-9]*_simple_statistics*_percfortrain=$(PERC)_sysset=$(SYSSET).csv)
+
+.PHONY: all accuracies correlations grid_search_best_params grid_search_results simple_statistics clean
+
+all: accuracies correlations grid_search_best_params grid_search_results simple_statistics
+
+accuracies: $(SOURCE_ACC)
+	Rscript combine_results.R $^
+correlations: $(SOURCE_COR)
+	Rscript combine_results.R $^
+grid_search_best_params: $(SOURCE_GSBP)
+	Rscript combine_results.R $^
+grid_search_results: $(SOURCE_GSR)
+	Rscript combine_results.R $^
+simple_statistics: $(SOURCE_SS)
+	Rscript combine_results.R $^
+
+clean:
+	rm -f $(SOURCE_ACC)
+	rm -f $(SOURCE_COR)
+	rm -f $(SOURCE_GSBP)
+	rm -f $(SOURCE_GSR)
+	rm -f $(SOURCE_SS)

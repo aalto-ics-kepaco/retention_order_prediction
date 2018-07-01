@@ -1,0 +1,2 @@
+target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
+FEM_orbitrap_urine	LIFE_old;LIFE_new;FEM_long;FEM_short;FEM_orbitrap_plasma;IPB_Halle;RIKEN;Eawag_XBridgeC18;MPI_Symmetry;MTBLS4;MTBLS17;MTBLS19;MTBLS20;MTBLS36;MTBLS38;MTBLS39;UFZ_Phenomenex;UniToyama_Atlantis;MTBLS52;FEM_lipids	0.0000	0.0000	1319.0640	13.0000	-1.0000	77.7520	39.3048	0.0000	0.0000	1.1270	0.0000	0.0000	0.4693	0.4693

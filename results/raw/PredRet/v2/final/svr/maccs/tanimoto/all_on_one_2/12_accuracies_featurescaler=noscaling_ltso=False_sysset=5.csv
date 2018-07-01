@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+MTBLS19	RIKEN;LIFE_new;MTBLS20;FEM_long	0.5102	0.1487

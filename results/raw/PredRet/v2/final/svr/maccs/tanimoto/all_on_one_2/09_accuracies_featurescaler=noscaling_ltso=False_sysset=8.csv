@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+MPI_Symmetry	FEM_orbitrap_urine;Eawag_XBridgeC18	0.7541	0.1040

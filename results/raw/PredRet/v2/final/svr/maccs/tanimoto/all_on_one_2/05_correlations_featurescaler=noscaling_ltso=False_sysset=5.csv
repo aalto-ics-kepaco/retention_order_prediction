@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_orbitrap_urine	RIKEN;LIFE_new;MTBLS20;FEM_long	0.4258	0.1960	0.5538	0.2211

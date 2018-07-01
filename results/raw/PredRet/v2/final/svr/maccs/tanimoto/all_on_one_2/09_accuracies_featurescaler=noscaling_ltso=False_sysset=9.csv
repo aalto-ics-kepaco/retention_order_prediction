@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+MPI_Symmetry	FEM_lipids;LIFE_new;LIFE_old;MTBLS20	0.5310	0.1277

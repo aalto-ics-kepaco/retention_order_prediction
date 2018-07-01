@@ -1,0 +1,2 @@
+target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
+FEM_long	FEM_orbitrap_urine;UFZ_Phenomenex	0.0000	0.0000	239.6000	28.1000	-1.0000	380.6400	10.2863	0.0000	0.0000	1.8070	0.3030	0.0000	8.5494	8.5494

@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+MTBLS20	LIFE_new;LIFE_old;IPB_Halle;FEM_lipids	0.7004	0.1325

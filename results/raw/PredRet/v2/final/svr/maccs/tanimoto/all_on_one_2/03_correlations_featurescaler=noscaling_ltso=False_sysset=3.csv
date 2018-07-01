@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_short	RIKEN;LIFE_old;MTBLS52	0.3534	0.1384	0.4733	0.1791

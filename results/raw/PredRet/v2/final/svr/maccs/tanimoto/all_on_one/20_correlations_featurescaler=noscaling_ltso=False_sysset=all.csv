@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_lipids	LIFE_old;LIFE_new;FEM_long;FEM_short;FEM_orbitrap_plasma;FEM_orbitrap_urine;IPB_Halle;RIKEN;Eawag_XBridgeC18;MPI_Symmetry;MTBLS4;MTBLS17;MTBLS19;MTBLS20;MTBLS36;MTBLS38;MTBLS39;UFZ_Phenomenex;UniToyama_Atlantis;MTBLS52;FEM_lipids	0.3676	0.1858	0.4746	0.2253

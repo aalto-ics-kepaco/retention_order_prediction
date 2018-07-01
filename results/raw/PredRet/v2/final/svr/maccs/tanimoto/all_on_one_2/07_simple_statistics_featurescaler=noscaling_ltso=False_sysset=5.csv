@@ -1,0 +1,2 @@
+target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
+RIKEN	RIKEN;LIFE_new;MTBLS20;FEM_long	0.0000	0.0000	524.9000	18.1000	-1.0000	153.2800	10.9267	0.0000	0.0000	0.3030	0.3030	0.0000	5.7323	5.7323

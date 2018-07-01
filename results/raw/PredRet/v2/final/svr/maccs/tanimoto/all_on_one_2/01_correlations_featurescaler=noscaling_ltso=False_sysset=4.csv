@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+LIFE_new	Eawag_XBridgeC18;UFZ_Phenomenex	0.4259	0.1802	0.5681	0.2249

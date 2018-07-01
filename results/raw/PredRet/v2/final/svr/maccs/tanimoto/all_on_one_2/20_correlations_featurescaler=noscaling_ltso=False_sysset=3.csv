@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+FEM_lipids	RIKEN;LIFE_old;MTBLS52	0.0094	0.1737	-0.0161	0.2431

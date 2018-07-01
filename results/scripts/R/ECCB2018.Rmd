@@ -1,0 +1,394 @@
+---
+title: "Liquid-Chromatography Retention Order Prediction for Metabolite Identification"
+author: "Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu"
+date: "July 01, 2018"
+output: html_document
+---
+
+```{r setup, include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library (ggplot2)
+library (data.table)
+library (knitr)
+library (OrgMassSpecR)
+library (shiny)
+
+base_dir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/"
+
+source (paste (base_dir, "results/scripts/R/tools/evaluate_rank_correlations.R", sep = "/"))
+source (paste (base_dir, "results/scripts/R/tools/kernel_tools.R", sep = "/"))
+source (paste (base_dir, "results/scripts/R/helper.R", sep = "/"))
+
+# Pre-processed retention time data
+sdir <- paste (base_dir, "data/processed/PredRet/v2/", sep = "/")
+# Results base-directoy
+sdir_results <- paste (base_dir, "results/raw/PredRet/v2/final/", sep = "/")
+sdir_results_base <- paste (base_dir, "results/raw/", sep = "/")
+```
+
+# Experimental results: Retention order prediction (Section 3.1)
+
+```{r, echo = FALSE}
+sysset <- 10
+allpairsfortest <- "True"
+```
+
+## Accuracy of binary vs. counting fingerprints (Section 3.1.3)
+
+Comparison of the pairwise prediction performance using binary and counting 
+MACCS fingerprints as predictor (see Table 3). 
+
+```{r, echo = FALSE}
+# Load data for section 3.1.3
+df_acc_3_1_3 <- data.frame()
+
+for (predictor in c("maccs", "maccsCount_f2dcf0b3")) {
+    tmp <- load_baseline_single_results (
+        measure = c("accuracy", "accuracy_std"), 
+        base_dir = paste0 (sdir_results, "ranksvm_slacktype=on_pairs/"),
+        predictor = predictor, kernel = ifelse (predictor == "maccs", "tanimoto", "minmax"),  
+        pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
+                            ireverse = "False", type = "order_graph"), 
+        feature_type = "difference", flavor = list (
+            allpairsfortest = allpairsfortest, featurescaler = "noscaling", sysset = sysset))
+    
+    tmp$predictor <- predictor
+    tmp$sysset <- sysset
+    
+    df_acc_3_1_3 <- rbind (tmp, df_acc_3_1_3)
+}
+```
+
+```{r, fig.align = "center", fig.width = 12, fig.height = 3, eval = FALSE, echo = FALSE}
+ggplot (df_acc_3_1_3[d_lower == 0 & d_upper == Inf],
+        aes (x = target, y = accuracy, fill = predictor, label = round (accuracy, 3))) + 
+        geom_col (position = "dodge") +
+        geom_errorbar (aes (ymin = accuracy - 2 * accuracy_std, 
+                            ymax = accuracy + 2 * accuracy_std),
+                       position = "dodge", alpha = 0.5) +
+        geom_hline (yintercept = 0.5, linetype = 2, alpha = 0.5) +
+        geom_text (size = 3, position = position_dodge (0.9), vjust = 4) + 
+        coord_cartesian (ylim = c(0.45, 1)) +
+        ylab ("Pairwise accuracy") + xlab ("Target system") +
+        ggtitle ("Performance comparison of MACCS binary and counting fingerprints") +
+        theme (plot.title = element_text (hjust = 0.5), 
+               plot.subtitle = element_text (hjust = 0.5), 
+               legend.position = "bottom")
+```
+
+```{r, echo = FALSE}
+renderTable ({
+    df_acc_3_1_3[d_lower == 0 & d_upper == Inf, 
+                 .(target_system = target, pairwise_accuracy = round (accuracy, 3), 
+                   pairwise_accuracy_2std = round (2 * accuracy_std, 3), predictor)]
+}, digits = 3) 
+```
+
+## Retention order prediction: RankSVM vs. SVR (Section 3.1.4)
+
+Comparison of RankSVM and SVR pairwise prediction accuracy.
+
+### Single system for training 
+
+A single system is used for the training. The performance is evaluated in target
+system used for training. Remember, we use cross-validation for the performance 
+evaluation. The results are shown in Table 4 in the paper (*Single system, target data only*).
+
+```{r, echo = FALSE}
+# Load data for section 3.1.4 (single system)
+df_acc_svm <- load_baseline_results (
+    measure = c("accuracy", "accuracy_std"), 
+    base_dir = paste0 (sdir_results, "ranksvm_slacktype=on_pairs/"),
+    predictor = "maccsCount_f2dcf0b3", kernel = "minmax",  
+    pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
+                        ireverse = "False", type = "order_graph"), 
+    feature_type = "difference", flavor = list (
+        embso = "True", featurescaler = "noscaling", sysset = sysset))
+
+df_acc_svm$sysset <- sysset
+df_acc_svm$estimator <- "RankSVM"
+
+df_acc_svr <- load_baseline_results (
+    measure = c("accuracy", "accuracy_std"), 
+    base_dir = paste0 (sdir_results, "svr/"),
+    predictor = "maccsCount_f2dcf0b3", kernel = "minmax",  
+    pair_params = NULL, feature_type = NULL, flavor = list (
+        embso = "True", featurescaler = "noscaling", sysset = sysset))
+
+df_acc_svr$sysset <- sysset
+df_acc_svr$estimator <- "SVR"
+
+df_acc_3_1_4_single_system <- rbind (df_acc_svm, df_acc_svr)
+
+df_acc_svm <- NULL
+df_acc_svr <- NULL
+```
+
+```{r, echo = FALSE}
+renderTable ({
+    df_acc_3_1_4_single_system[d_lower == 0 & d_upper == Inf & target == source,
+                               .(target_system = target, pairwise_accuracy = round (accuracy, 3),
+                                 pairwise_accuracy_2std = round (2 * accuracy_std, 3), estimator)]
+}, digits = 3)
+```
+
+### Multiple systems for training
+
+All systems in the dataset are used for training. We vary the percentage of target
+system data used for training from 0% (10%) to 100%. The resulting curves are 
+averaged across all target systems (Figure 4).
+
+```{r, echo = FALSE, eval = TRUE}
+# Load data
+bl_rsvm_p <- data.table()
+for (perc in seq (10, 100, by = 10)) {
+    tmp <- load_baseline_single_perc_results (
+        measure = c("accuracy", "accuracy_std"), 
+        #measure = c("rank_corr"),
+        base_dir = paste0 (sdir_results, "ranksvm_slacktype=on_pairs/"), 
+        predictor = "maccsCount_f2dcf0b3", kernel = "minmax", pair_params = list (
+            allow_overlap = "True", d_lower = 0, d_upper = 16, ireverse = "False", 
+            type = "order_graph"),
+        flavor = list (featurescaler = "noscaling", percfortrain = perc, sysset = "10"))    
+    tmp$perc <- perc
+    tmp$embso <- TRUE
+    
+    bl_rsvm_p <- rbind (bl_rsvm_p, tmp)
+}
+bl_rsvm_p$estimator <- "RankSVM"
+bl_rsvm_p$scenario <- "Single system"
+bl_rsvm_p$sysset <- "Single system"
+
+bl_svr_p <- data.table()
+for (perc in seq (10, 100, by = 10)) {
+    tmp <- load_baseline_single_perc_results (
+        measure = c("accuracy", "accuracy_std"), 
+        #measure = c("rank_corr"),
+        base_dir = paste0 (sdir_results, "svr/"), feature_type = NULL,
+        predictor = "maccsCount_f2dcf0b3", kernel = "minmax", pair_params = NULL,
+        flavor = list (featurescaler = "noscaling", percfortrain = perc, sysset = "10"))    
+    tmp$perc <- perc
+    tmp$embso <- TRUE
+    
+    bl_svr_p <- rbind (bl_svr_p, tmp)
+}
+bl_svr_p$estimator <- "SVR"
+bl_svr_p$scenario <- "Single system"
+bl_svr_p$sysset <- "Single system"
+
+aoo_rsvm_p <- data.table()
+for (perc in seq (0, 100, by = 10)) {
+    for (embso in c("True", "False")) {
+        tmp <- load_all_on_one_perc_results (
+            measure = c("accuracy", "accuracy_std"), 
+            #measure = c("rank_corr"), 
+            base_dir = paste0 (sdir_results, "ranksvm_slacktype=on_pairs/"), 
+            predictor = "maccsCount_f2dcf0b3", kernel = "minmax", pair_params = list (
+                allow_overlap = "True", d_lower = 0, d_upper = 16, ireverse = "False", 
+                type = "order_graph"),
+            flavor = list (embso = embso, featurescaler = "noscaling", 
+                           ltso = "False", percfortrain = perc, sysset = "10"))    
+        tmp$perc <- perc
+        tmp$embso <- as.logical (embso)
+        
+        aoo_rsvm_p <- rbind (aoo_rsvm_p, tmp)
+    }
+}
+aoo_rsvm_p$estimator <- "RankSVM"
+aoo_rsvm_p$scenario <- "Set of systems"
+aoo_rsvm_p$sysset <- "Multiple systems"
+
+aoo_svr_p <- data.table()
+for (perc in seq (0, 100, by = 10)) {
+    for (embso in c("True", "False")) {
+        tmp <- load_all_on_one_perc_results (
+            measure = c("accuracy", "accuracy_std"),
+            #measure = c("rank_corr"),
+            pair_params = NULL,
+            base_dir = paste0 (sdir_results, "svr/"), feature_type = NULL, 
+            predictor = "maccsCount_f2dcf0b3", kernel = "minmax", 
+            flavor = list (embso = embso, featurescaler = "noscaling", 
+                           ltso = "False", percfortrain = perc, sysset = "10"))    
+        tmp$perc <- perc
+        tmp$embso <- as.logical (embso)
+        
+        aoo_svr_p <- rbind (aoo_svr_p, tmp)
+    }
+}
+aoo_svr_p$estimator <- "SVR"
+aoo_svr_p$scenario <- "Set of systems"
+aoo_svr_p$sysset <- "Multiple systems"
+```
+
+```{r, fig.align = "center", fig.width = 6, fig.height = 3, eval = TRUE, echo = FALSE}
+df_acc_3_1_4_multiple_systems <- rbind (
+    bl_rsvm_p[d_lower == 0 & d_upper == Inf],
+    bl_svr_p[d_lower == 0 & d_upper == Inf],
+    aoo_rsvm_p[d_lower == 0 & d_upper == Inf],
+    aoo_svr_p[d_lower == 0 & d_upper == Inf])[embso == TRUE]
+ggplot (df_acc_3_1_4_multiple_systems[, .(mean_accuracy = mean (accuracy)), 
+                                      by = c("perc", "estimator", "scenario", "sysset")], 
+        aes (x = perc, y = mean_accuracy, color = estimator, 
+             linetype = sysset)) +
+    geom_point (size = 2) + geom_line (size = 0.5) +
+    xlab ("Percentage of target system molecules used for training") +
+    ylab ("Pairwise accuracy\n(averaged across all target systems)") +
+    guides (color = guide_legend (title = "Method"),
+            linetype = guide_legend (title = "Training set")) +
+    theme_bw()
+```
+
+Result shown in Table 4.
+```{r, eval = TRUE, echo = FALSE}
+renderTable({
+    rbind (
+        bl_rsvm_p[d_lower == 0 & d_upper == Inf & perc == 100,
+              .(target_system = target, sysset, 
+                pairwise_accuracy = round (accuracy, 3),
+                pairwise_accuracy_2std = round (2 * accuracy_std, 3),
+                estimator, perc = 100)],
+        bl_svr_p[d_lower == 0 & d_upper == Inf & perc == 100,
+              .(target_system = target, sysset, 
+                pairwise_accuracy = round (accuracy, 3),
+                pairwise_accuracy_2std = round (2 * accuracy_std, 3),
+                estimator, perc = 100)],
+        aoo_rsvm_p[d_lower == 0 & d_upper == Inf & perc == 100 & embso == TRUE,
+              .(target_system = target, sysset, 
+                pairwise_accuracy = round (accuracy, 3),
+                pairwise_accuracy_2std = round (2 * accuracy_std, 3),
+                estimator, perc = 100)],
+        aoo_svr_p[d_lower == 0 & d_upper == Inf & perc == 100 & embso == TRUE,
+              .(target_system = target, sysset, 
+                pairwise_accuracy = round (accuracy, 3),
+                pairwise_accuracy_2std = round (2 * accuracy_std, 3),
+                estimator, perc = 100)],
+        aoo_rsvm_p[d_lower == 0 & d_upper == Inf & perc == 0 & embso == TRUE,
+              .(target_system = target, sysset, 
+                pairwise_accuracy = round (accuracy, 3),
+                pairwise_accuracy_2std = round (2 * accuracy_std, 3),
+                estimator, perc = 0)],
+        aoo_svr_p[d_lower == 0 & d_upper == Inf & perc == 0 & embso == TRUE,
+              .(target_system = target, sysset, 
+                pairwise_accuracy = round (accuracy, 3),
+                pairwise_accuracy_2std = round (2 * accuracy_std, 3),
+                estimator, perc = 0)])
+}, digits = 3)
+```
+
+# Experimental results: Metabolite identification (Section 3.2)
+
+```{r, echo = FALSE, eval = TRUE}
+df_top1acc_FINAL_s10 <- NULL
+df_top1acc_FINAL_s10_imp <- NULL
+df_top1acc_FINAL_imp <- NULL
+tmp <- NULL
+
+D_space <- c("0", "1e-05", "0.0001", "0.0005", "0.001", "0.0025", "0.005", "0.0075",
+             "0.01", "0.025", "0.05", "0.075", "0.1")
+
+use_log <- "False"
+n_rep <- 1000
+
+df_top1acc_FINAL_s10_imp <- data.table()
+for (D in D_space) {
+    tmp <- load_topkacc_of_reranked_molecules_GS_BS (
+        base_dir = paste0 (sdir_results_base, "/s10_imp_no3D/final/ranksvm_slacktype=on_pairs/"),
+        predictor = "maccsCount_f2dcf0b3", kernel = "minmax", 
+        predictor_column = NULL, kernel_column = NULL,
+        pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
+                            ireverse = "False", type = "order_graph"), 
+        feature_type = "difference", flavor = list (
+            D = D, epsrt = "0", featscaler = "noscaling", nrds = as.character(n_rep), sysset = "10_imp",
+            usecoldesc = "False", uselog = use_log, wfun = "pwmax"))
+     
+    tmp$D <- as.numeric (D)
+    tmp$wfun <- "pwmax"
+    tmp$sysset <- "Others & target"
+    
+    df_top1acc_FINAL_s10_imp <- rbind (df_top1acc_FINAL_s10_imp, tmp)
+}
+
+df_top1acc_FINAL_imp <- data.table()
+for (D in D_space) {
+    tmp <- load_topkacc_of_reranked_molecules_GS_BS (
+        base_dir = paste0 (sdir_results_base, "/s10_imp_no3D/final/ranksvm_slacktype=on_pairs/"),
+        predictor = "maccsCount_f2dcf0b3", kernel = "minmax", 
+        predictor_column = NULL, kernel_column = NULL,
+        pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
+                            ireverse = "False", type = "order_graph"), 
+        feature_type = "difference", flavor = list (
+            D = D, epsrt = "0", featscaler = "noscaling", nrds = as.character(n_rep), sysset = "imp",
+            usecoldesc = "False", uselog = use_log, wfun = "pwmax"))
+     
+    tmp$D <- as.numeric (D)
+    tmp$wfun <- "pwmax"
+    tmp$sysset <- "Target"
+    
+    df_top1acc_FINAL_imp <- rbind (df_top1acc_FINAL_imp, tmp)
+}
+
+df_top1acc_FINAL_s10 <- data.table()
+for (D in D_space) {
+    tmp <- load_topkacc_of_reranked_molecules_GS_BS (
+        base_dir = paste0 (sdir_results_base, "/PredRet/v2/final/ranksvm_slacktype=on_pairs/"),
+        predictor = "maccsCount_f2dcf0b3", kernel = "minmax", 
+        predictor_column = NULL, kernel_column = NULL,
+        pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
+                            ireverse = "False", type = "order_graph"), 
+        feature_type = "difference", flavor = list (
+            D = D, epsrt = "0", featscaler = "noscaling", nrds = as.character(n_rep), sysset = "10",
+            usecoldesc = "False", uselog = use_log, wfun = "pwmax"))
+     
+    tmp$D <- as.numeric (D)
+    tmp$wfun <- "pwmax"
+    tmp$sysset <- "Others"
+    
+    df_top1acc_FINAL_s10 <- rbind (df_top1acc_FINAL_s10, tmp)
+}
+
+```
+
+Average percentage of correctly identified molecular structures for different values
+of $D$ (Figure 5).
+
+```{r, fig.align = "center", fig.width = 6, fig.height = 3, eval = TRUE, echo = FALSE}
+data_greater0 <- NULL
+data_equal0 <- NULL
+
+data_greater0 <- rbind (
+    df_top1acc_FINAL_s10_imp, df_top1acc_FINAL_s10, df_top1acc_FINAL_imp
+    )[D > 0.0001 & D < 0.25, 
+      .(top1_acc_mean = mean (top1_acc), top1_acc_sde = std_err (top1_acc)),
+      by = c("sysset", "D", "wfun", "n_spectra")]
+
+data_equal0 <- rbind (
+    df_top1acc_FINAL_s10_imp, df_top1acc_FINAL_s10, df_top1acc_FINAL_imp
+    )[D == 0, 
+      .(top1_acc_mean = mean (top1_acc), top1_acc_sde = std_err (top1_acc)),
+      by = c("sysset", "D", "wfun", "n_spectra")]
+data_equal0 <- unique (data_equal0)
+
+ggplot (data_greater0, 
+        aes (x = D, y = top1_acc_mean, color = sysset, fill = sysset)) +
+    geom_hline (data = data_equal0, aes (yintercept = top1_acc_mean), lty = 1, alpha = 1) +
+    geom_point () +  geom_line (lty = 2, alpha = 1) +
+    scale_x_log10 (breaks = as.numeric (D_space[2:length(D_space)])) +
+    xlab ("D: Weighting of the order information") +
+    ylab ("Percentage of correctly\nidentified compounds") +
+    scale_fill_discrete(guide = FALSE) +
+    theme_bw() +
+    theme (axis.text.x = element_text (angle = 45, hjust = 1),
+           legend.position = "right") + 
+    guides (color = guide_legend (title = "RankSVM\ntraining set"))
+```
+
+Significants test for $D$ with maximum identification accuracy:
+
+- Others \& target:
+```{r, eval = TRUE}
+t.test(df_top1acc_FINAL_s10_imp[D == 0.0075]$top1_acc, mu = mean (df_top1acc_FINAL_s10_imp[D == 0]$top1_acc))
+```
+- Others:
+```{r, eval = TRUE}
+t.test(df_top1acc_FINAL_s10[D == 0.01]$top1_acc, mu = mean (df_top1acc_FINAL_s10[D == 0]$top1_acc))
+```

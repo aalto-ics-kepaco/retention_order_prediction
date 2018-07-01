@@ -1,0 +1,2 @@
+target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
+MTBLS52	Eawag_XBridgeC18;UFZ_Phenomenex	-0.0774	0.0000	-0.1364	0.0000

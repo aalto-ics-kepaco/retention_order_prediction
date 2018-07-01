@@ -1,0 +1,2 @@
+target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
+MPI_Symmetry	LIFE_new;LIFE_old;IPB_Halle;FEM_lipids	0.0000	0.0000	254.3280	10.0000	-1.0000	45.0000	10.2927	0.0000	0.0000	1.0532	0.0000	0.0000	0.0000	0.0000

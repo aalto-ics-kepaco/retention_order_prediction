@@ -1,0 +1,2 @@
+target_system	training_system	score	score_std
+MPI_Symmetry	Eawag_XBridgeC18;UFZ_Phenomenex	0.6462	0.1155
