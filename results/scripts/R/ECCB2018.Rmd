@@ -76,12 +76,10 @@ ggplot (df_acc_3_1_3[d_lower == 0 & d_upper == Inf],
                legend.position = "bottom")
 ```
 
-```{r, echo = FALSE}
-renderTable ({
-    df_acc_3_1_3[d_lower == 0 & d_upper == Inf, 
+```{r, echo = FALSE, results = "asis"}
+kable (df_acc_3_1_3[d_lower == 0 & d_upper == Inf, 
                  .(target_system = target, pairwise_accuracy = round (accuracy, 3), 
-                   pairwise_accuracy_2std = round (2 * accuracy_std, 3), predictor)]
-}, digits = 3) 
+                   pairwise_accuracy_2std = round (2 * accuracy_std, 3), predictor)])
 ```
 
 ## Retention order prediction: RankSVM vs. SVR (Section 3.1.4)
@@ -124,12 +122,10 @@ df_acc_svm <- NULL
 df_acc_svr <- NULL
 ```
 
-```{r, echo = FALSE}
-renderTable ({
-    df_acc_3_1_4_single_system[d_lower == 0 & d_upper == Inf & target == source,
-                               .(target_system = target, pairwise_accuracy = round (accuracy, 3),
-                                 pairwise_accuracy_2std = round (2 * accuracy_std, 3), estimator)]
-}, digits = 3)
+```{r, echo = FALSE, results = "asis"}
+kable (df_acc_3_1_4_single_system[d_lower == 0 & d_upper == Inf & target == source,
+                                  .(target_system = target, pairwise_accuracy = round (accuracy, 3),
+                                    pairwise_accuracy_2std = round (2 * accuracy_std, 3), estimator)])
 ```
 
 ### Multiple systems for training
@@ -239,9 +235,8 @@ ggplot (df_acc_3_1_4_multiple_systems[, .(mean_accuracy = mean (accuracy)),
 ```
 
 Result shown in Table 4.
-```{r, eval = TRUE, echo = FALSE}
-renderTable({
-    rbind (
+```{r, eval = TRUE, echo = FALSE, results = "asis"}
+kable (rbind (
         bl_rsvm_p[d_lower == 0 & d_upper == Inf & perc == 100,
               .(target_system = target, sysset, 
                 pairwise_accuracy = round (accuracy, 3),
@@ -271,8 +266,7 @@ renderTable({
               .(target_system = target, sysset, 
                 pairwise_accuracy = round (accuracy, 3),
                 pairwise_accuracy_2std = round (2 * accuracy_std, 3),
-                estimator, perc = 0)])
-}, digits = 3)
+                estimator, perc = 0)]))
 ```
 
 # Experimental results: Metabolite identification (Section 3.2)
