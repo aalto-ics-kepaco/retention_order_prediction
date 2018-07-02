@@ -300,42 +300,9 @@ load_topkacc_of_reranked_molecules <- function (
     return (data.table (read.csv (fn, sep = "\t")))
 }
 
-load_topkacc_of_reranked_molecules_2 <- function (...) {
-    return (load_topkacc_of_reranked_molecules (
-        scenario = "evaluate_metabolite_identification_performance_2", ...))
-}
-
-load_topkacc_of_reranked_molecules_3 <- function (...) {
-    return (load_topkacc_of_reranked_molecules (
-        scenario = "met_ident_perf_3", ...))
-}
-
-load_topkacc_of_reranked_molecules_GS <- function (...) {
-    return (load_topkacc_of_reranked_molecules (
-        scenario = "met_ident_perf_GS", ...))
-}
-
 load_topkacc_of_reranked_molecules_GS_BS <- function (...) {
     return (load_topkacc_of_reranked_molecules (
         scenario = "met_ident_perf_GS_BS", ...))
-}
-
-load_top1_of_reranked_molecules_3 <- function (...) {
-    df_D_greater_0 <- load_topkacc_of_reranked_molecules (
-        scenario = "met_ident_perf_3", prefix = "top1_acc", ...)
-    df_D_equal_0 <- load_topkacc_of_reranked_molecules (
-        scenario = "met_ident_perf_3", prefix = "top1_acc_baseline", ...)
-    
-    return (list (df_D_greater_0 = df_D_greater_0, df_D_equal_0 = df_D_equal_0))
-}
-
-load_top1_of_reranked_molecules_4 <- function (...) {
-    df_D_greater_0 <- load_topkacc_of_reranked_molecules (
-        scenario = "met_ident_perf_4", prefix = "top1_acc", ...)
-    df_D_equal_0 <- load_topkacc_of_reranked_molecules (
-        scenario = "met_ident_perf_4", prefix = "top1_acc_baseline", ...)
-    
-    return (list (df_D_greater_0 = df_D_greater_0, df_D_equal_0 = df_D_equal_0))
 }
 
 #' Load the results for the pairwise prediction accuracy of the target system
@@ -387,41 +354,3 @@ load_baseline_simple_statistics <- function (...)
 {
     return (load_simple_statistics (scenario = "baseline", ...))
 }
-
-#' Load the simple statistics for the centering and normalization comparison
-load_test_centering_and_normalizing_statistics <- function (
-    scaler = "unscaled", centernormfeat = "False", 
-    prefix = "grid_search_best_params", ...)
-{
-    return (load_statistics (
-        scenario = "test_centering_and_normalizing", prefix = prefix,
-        flavor = list (scaler = scaler, centernormfeat = centernormfeat), ...))
-}
-
-load_results_for_comparison <- function (input_dir = "/m/cs/scratch/kepaco/bache1/data/retention_time_prediction/rank_svm/output/", 
-                                         measure = "rank_corr", scenarios = "all", predictor = "desc") {
-
-    # Load the baseline
-    dt.out <- load_baseline_results (input_dir, measure)
-    
-    # Load the different settings
-    for (setting in scenarios) for (ltso in c(FALSE, TRUE)) {
-        filename <- paste0 (input_dir, switch (setting, all="/on_one/on_one", "/selected_scenarios/selected_scenarios"), 
-                            "-ltso=", ifelse (ltso, "False", "True"), "-set=", setting, "-", 
-                            switch (measure, rank_corr=, spear_corr="correlations", "accuracies"), 
-                            "-pred=", predictor, ".csv")
-        
-        dt <- data.table (read.table (filename, sep = ",", header = TRUE))
-        setnames (dt, "target_system",   "target")
-        setnames (dt, "training_system", "source")
-        setkey (dt, "target")
-        
-        dt <- dt[, .(measure = get (measure), target, setting = setting, ltso = ltso)]
-        setnames (dt, "measure", measure)
-        
-        dt.out <- rbind (dt.out, dt)
-    }
-    
-    return (dt.out)
-}
-
