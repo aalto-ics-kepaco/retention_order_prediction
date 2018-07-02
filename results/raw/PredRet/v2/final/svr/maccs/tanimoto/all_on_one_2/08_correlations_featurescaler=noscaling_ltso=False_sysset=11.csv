@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-Eawag_XBridgeC18	MTBLS39;MTBLS52;MTBLS17;MTBLS19;MTBLS4;MTBLS38;MPI_Symmetry	0.0804	0.1403	0.1183	0.2036

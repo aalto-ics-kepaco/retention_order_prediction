@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-MPI_Symmetry	IPB_Halle;LIFE_new;MTBLS36;MTBLS38	0.3945	0.2174	0.5112	0.2565

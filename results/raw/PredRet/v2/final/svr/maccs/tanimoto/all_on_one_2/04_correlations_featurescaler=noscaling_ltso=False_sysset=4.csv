@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-FEM_orbitrap_plasma	Eawag_XBridgeC18;UFZ_Phenomenex	0.4420	0.1699	0.5802	0.1945

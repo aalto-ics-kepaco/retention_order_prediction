@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-LIFE_old	Eawag_XBridgeC18;FEM_long;RIKEN;UFZ_Phenomenex	0.4968	0.1418	0.6559	0.1510

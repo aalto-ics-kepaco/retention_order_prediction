@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-MTBLS19	RIKEN;LIFE_new;MTBLS20;FEM_long	0.0459	0.3028	0.0679	0.3691

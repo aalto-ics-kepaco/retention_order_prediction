@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-RIKEN	RIKEN	0.6083	0.1530	0.7527	0.1612

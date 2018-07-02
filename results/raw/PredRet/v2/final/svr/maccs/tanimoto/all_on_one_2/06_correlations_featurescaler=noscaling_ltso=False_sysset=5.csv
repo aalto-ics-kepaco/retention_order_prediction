@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-IPB_Halle	RIKEN;LIFE_new;MTBLS20;FEM_long	0.3458	0.1259	0.4950	0.1604

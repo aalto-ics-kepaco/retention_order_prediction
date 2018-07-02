@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-FEM_orbitrap_plasma	FEM_orbitrap_plasma	0.6783	0.1689	0.8016	0.1482

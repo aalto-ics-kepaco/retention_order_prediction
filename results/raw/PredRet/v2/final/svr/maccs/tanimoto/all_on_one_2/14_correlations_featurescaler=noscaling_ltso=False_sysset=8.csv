@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-MTBLS36	FEM_orbitrap_urine;Eawag_XBridgeC18	0.3830	0.1668	0.5042	0.1993

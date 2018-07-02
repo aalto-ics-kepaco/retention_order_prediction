@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-UniToyama_Atlantis	UniToyama_Atlantis	0.6644	0.1826	0.7985	0.1722

@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-MTBLS20	IPB_Halle;LIFE_new;MTBLS36;MTBLS38	0.3950	0.2750	0.4919	0.3169

@@ -1,2 +1,0 @@
-target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
-MTBLS52	FEM_long;FEM_short;FEM_orbitrap_plasma;FEM_orbitrap_urine	0.0000	0.0000	346.0000	19.0000	-1.0000	171.0000	10.3561	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000	0.0000

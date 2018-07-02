@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-Eawag_XBridgeC18	RIKEN;LIFE_old;MTBLS52	0.0936	0.1035	0.1346	0.1468

@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-Eawag_XBridgeC18	Eawag_XBridgeC18	0.4977	0.0901	0.6672	0.1075

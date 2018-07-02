@@ -1,2 +1,0 @@
-target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
-FEM_short	FEM_lipids;LIFE_new;LIFE_old;MTBLS20	0.0000	0.0000	282.9360	17.0000	-1.0000	135.6480	12.9507	0.0000	0.0000	0.9567	0.0000	0.0000	0.5426	0.5426

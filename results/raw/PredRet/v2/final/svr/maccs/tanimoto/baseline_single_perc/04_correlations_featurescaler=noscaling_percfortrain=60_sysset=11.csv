@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-MTBLS4	MTBLS4	0.6135	0.1353	0.7387	0.1347

@@ -1,2 +1,0 @@
-target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
-IPB_Halle	IPB_Halle;LIFE_new;MTBLS36;MTBLS38	0.0000	0.0000	193.0000	14.0000	-1.0000	90.4240	10.3679	0.0000	0.0000	0.0000	0.0000	0.0000	0.7648	0.7648

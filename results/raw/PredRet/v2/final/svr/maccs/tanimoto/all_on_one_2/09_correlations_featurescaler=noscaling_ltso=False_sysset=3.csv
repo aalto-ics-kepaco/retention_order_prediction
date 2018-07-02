@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-MPI_Symmetry	RIKEN;LIFE_old;MTBLS52	0.2198	0.2249	0.3054	0.2876

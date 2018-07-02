@@ -1,2 +1,0 @@
-target_system	training_system	score	score_std
-MTBLS17	FEM_long;FEM_short;FEM_orbitrap_plasma;FEM_orbitrap_urine	0.3166	0.1735

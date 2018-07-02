@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-Eawag_XBridgeC18	LIFE_new;LIFE_old;IPB_Halle;FEM_lipids	0.2314	0.1286	0.3125	0.1767

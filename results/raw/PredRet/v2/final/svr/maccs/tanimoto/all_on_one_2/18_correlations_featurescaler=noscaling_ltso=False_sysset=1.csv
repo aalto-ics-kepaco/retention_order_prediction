@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-UniToyama_Atlantis	FEM_long;FEM_short;FEM_orbitrap_plasma;FEM_orbitrap_urine	0.4462	0.2055	0.5911	0.2298

@@ -1,2 +1,0 @@
-target_system	training_systems	n_shared_mol	p_shared_mol	n_train_mol	n_test_mol	n_train_pairs	n_test_pairs	grid_search_time	n_shared_mol_std	p_shared_mol_std	n_train_mol_std	n_test_mol_std	n_train_pairs_std	n_test_pairs_std	grid_search_time_std
-FEM_orbitrap_plasma	IPB_Halle;LIFE_new;MTBLS36;MTBLS38	0.0000	0.0000	204.9000	7.9000	-1.0000	27.2800	11.2076	0.0000	0.0000	1.1112	0.3030	0.0000	2.1193	2.1193

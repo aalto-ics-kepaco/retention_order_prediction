@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-MTBLS17	RIKEN;LIFE_old;MTBLS52	0.2689	0.3226	0.3517	0.3745

@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-FEM_lipids	FEM_lipids	0.5810	0.1355	0.7246	0.1390

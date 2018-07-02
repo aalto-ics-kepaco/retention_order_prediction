@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-IPB_Halle	IPB_Halle	0.5725	0.1707	0.7017	0.1763

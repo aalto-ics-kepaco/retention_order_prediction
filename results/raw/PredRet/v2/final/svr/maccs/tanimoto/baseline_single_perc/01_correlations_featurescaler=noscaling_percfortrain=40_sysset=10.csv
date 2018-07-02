@@ -1,2 +1,0 @@
-target_system	training_system	rank_corr	rank_corr_std	spear_corr	spear_corr_std
-FEM_long	FEM_long	0.6775	0.0776	0.8373	0.0720
