@@ -1,1 +1,15 @@
 raw/PredRet/v2/debug/*
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccs/tanimoto/baseline_single/Makefile
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccs/tanimoto/baseline_single/combine_results.R
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccsCount_f2dcf0b3/minmax/all_on_one_perc/Makefile
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccsCount_f2dcf0b3/minmax/all_on_one_perc/combine_results.R
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccsCount_f2dcf0b3/minmax/baseline_single/Makefile
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccsCount_f2dcf0b3/minmax/baseline_single/combine_results.R
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccsCount_f2dcf0b3/minmax/baseline_single_perc/Makefile
+raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccsCount_f2dcf0b3/minmax/baseline_single_perc/combine_results.R
+raw/PredRet/v2/final/svr/maccsCount_f2dcf0b3/minmax/all_on_one_perc/Makefile
+raw/PredRet/v2/final/svr/maccsCount_f2dcf0b3/minmax/all_on_one_perc/combine_results.R
+raw/PredRet/v2/final/svr/maccsCount_f2dcf0b3/minmax/baseline/Makefile
+raw/PredRet/v2/final/svr/maccsCount_f2dcf0b3/minmax/baseline/combine_results.R
+raw/PredRet/v2/final/svr/maccsCount_f2dcf0b3/minmax/baseline_single_perc/Makefile
+raw/PredRet/v2/final/svr/maccsCount_f2dcf0b3/minmax/baseline_single_perc/combine_results.R
