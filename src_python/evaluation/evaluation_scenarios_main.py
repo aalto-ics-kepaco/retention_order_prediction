@@ -232,7 +232,7 @@ if __name__ == "__main__":
 
     # Create final output dir based on the settings for the experiment
     output_dir += "/".join ([x for x in [dict2str (pair_params, sep = "_"), feature_type] if x is not None]) + "/"
-    output_dir += predictor
+    output_dir += "_".join (predictor)
     if poly_feature_exp:
         output_dir += "_POLYD2"
     output_dir += "/" + kernel + "/" + scenario + "/"
@@ -251,10 +251,12 @@ if __name__ == "__main__":
         kernel_params = {"kernel": kernel, "gamma": [0.1, 0.25, 0.5, 1, 2, 3],
                          "scaler": feature_scaler, "poly_feature_exp": poly_feature_exp}
 
-        reranking_params = {"D": [0, 1e-3, 10], "use_sign": [False], "topk": 1, "cut_off_n_cand": 100,
-                            "n_rep": 3, "epsilon_rt": [-1],
-                            "min_rt_delta_range": np.arange (0, 0.20, 0.05)}
+        reranking_params = {"D": [0, 5e-3, 7.5e-3, 1e-2],
+                            "use_sign": [False], "topk": 1, "cut_off_n_cand": 300, "n_rep": 10,
+                            "epsilon_rt": 0, "min_rt_delta_range": [0], "use_log": use_log_reranking}
     else:
+        # Hyper-parameter grids, number of cross-validation / random split folds, number of repetitions
+        # (e.g. evaluations) used in the paper.
         opt_params = {"C": [0.001, 0.01, 0.1, 1, 10, 100, 1000],
                       "epsilon": [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10],
                       "n_splits_shuffle": 25, "n_splits_nshuffle": 25,

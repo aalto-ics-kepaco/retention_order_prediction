@@ -1,7 +1,7 @@
 {
   "data": {
-    "base_dir": "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/",
-    "dataset": "s10_imp_no3D",
+    "base_dir": "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/",
+    "dataset": "PredRet/v2",
     "excl_mol_by_struct_only": true,
     "systems": {
       "all": ["LIFE_old", "LIFE_new", "FEM_long", "FEM_short",
@@ -31,19 +31,13 @@
       "all_pairs_for_test": true
     },
     "ranksvm": {
-      "feature_type": "difference",
       "pair_params": {
         "type": "order_graph",
         "d_upper": 16,
         "d_lower": 0,
         "allow_overlap": true,
         "ireverse": false
-      },
-      "slack_type": "on_pairs"
-    },
-    "kernelridge": {
-      "centering": true,
-      "normalization": true
+      }
     },
     "svr": {},
     "molecule_representation": {
@@ -51,19 +45,11 @@
       "predictor": ["maccsCount_f2dcf0b3"],
       "feature_scaler": "noscaling",
       "poly_feature_exp": false
-    },
-    "column_representation": {
-      "use_column_descriptors": false,
-      "kernel": "rbf",
-      "predictor": "colselec",
-      "feature_scaler": "std",
-      "feature_itegration": "multi"
     }
   },
   "application": {
     "candidate_reranking": {
       "dp_weight_function": "pwmax",
-      "n_splits": 3,
       "use_log": false
     }
   }
