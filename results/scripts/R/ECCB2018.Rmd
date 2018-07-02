@@ -28,10 +28,6 @@ sdir_results_base <- paste (base_dir, "results/raw/", sep = "/")
 
 # Experimental results: Retention order prediction (Section 3.1)
 
-```{r, echo = FALSE}
-sysset <- 10
-```
-
 ## Accuracy of binary vs. counting fingerprints (Section 3.1.3)
 
 Comparison of the pairwise prediction performance using binary and counting 
@@ -49,10 +45,10 @@ for (predictor in c("maccs", "maccsCount_f2dcf0b3")) {
         pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
                             ireverse = "False", type = "order_graph"), 
         feature_type = "difference", flavor = list (
-            allpairsfortest = "True", featurescaler = "noscaling", sysset = sysset))
+            allpairsfortest = "True", featurescaler = "noscaling", sysset = 10))
     
     tmp$predictor <- predictor
-    tmp$sysset <- sysset
+    tmp$sysset <- 10
     
     df_acc_3_1_3 <- rbind (tmp, df_acc_3_1_3)
 }
@@ -101,9 +97,9 @@ df_acc_svm <- load_baseline_single_results (
     predictor = "maccsCount_f2dcf0b3", kernel = "minmax",  
     pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
                         ireverse = "False", type = "order_graph"), 
-    feature_type = "difference", flavor = list (allpairsfortest = "True", featurescaler = "noscaling", sysset = sysset))
+    feature_type = "difference", flavor = list (allpairsfortest = "True", featurescaler = "noscaling", sysset = "10"))
 
-df_acc_svm$sysset <- sysset
+df_acc_svm$sysset <- 10
 df_acc_svm$estimator <- "RankSVM"
 
 df_acc_svr <- load_baseline_results (
@@ -111,9 +107,9 @@ df_acc_svr <- load_baseline_results (
     base_dir = paste0 (sdir_results, "svr/"),
     predictor = "maccsCount_f2dcf0b3", kernel = "minmax",  
     pair_params = NULL, feature_type = NULL, flavor = list (
-        embso = "True", featurescaler = "noscaling", sysset = sysset))
+        embso = "True", featurescaler = "noscaling", sysset = "10"))
 
-df_acc_svr$sysset <- sysset
+df_acc_svr$sysset <- 10
 df_acc_svr$estimator <- "SVR"
 
 df_acc_3_1_4_single_system <- rbind (df_acc_svm, df_acc_svr)
@@ -385,4 +381,8 @@ t.test(df_top1acc_FINAL_s10_imp[D == 0.0075]$top1_acc, mu = mean (df_top1acc_FIN
 - Others:
 ```{r, eval = TRUE}
 t.test(df_top1acc_FINAL_s10[D == 0.01]$top1_acc, mu = mean (df_top1acc_FINAL_s10[D == 0]$top1_acc))
+```
+- Target:
+```{r, eval = TRUE}
+t.test(df_top1acc_FINAL_imp[D == 0.0075]$top1_acc, mu = mean (df_top1acc_FINAL_imp[D == 0]$top1_acc))
 ```

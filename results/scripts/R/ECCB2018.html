@@ -584,6 +584,21 @@ $(document).ready(function () {
 ## sample estimates:
 ## mean of x 
 ##   23.8975</code></pre>
+<ul>
+<li>Target:</li>
+</ul>
+<pre class="r"><code>t.test(df_top1acc_FINAL_imp[D == 0.0075]$top1_acc, mu = mean (df_top1acc_FINAL_imp[D == 0]$top1_acc))</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  df_top1acc_FINAL_imp[D == 0.0075]$top1_acc
+## t = -0.25154, df = 999, p-value = 0.8014
+## alternative hypothesis: true mean is not equal to 22.65
+## 95 percent confidence interval:
+##  22.45197 22.80303
+## sample estimates:
+## mean of x 
+##   22.6275</code></pre>
 </div>
 
 
