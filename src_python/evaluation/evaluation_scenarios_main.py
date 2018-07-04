@@ -714,9 +714,6 @@ if __name__ == "__main__":
 
         # Get model filename and check whether it already has been trained:
         model_fn = model_output_dir + "/ranking_model_" + dict2str (param_suffixes, sep = "_") + ".mdl"
-        best_params_fn = model_output_dir + "/best_params_" + dict2str (param_suffixes, sep = "_") + ".prm"
-        training_data_fn = model_output_dir + "/training_data_" + dict2str (param_suffixes, sep = "_") + ".data"
-        kernel_params_fn = model_output_dir + "/kernel_params_" + dict2str (param_suffixes, sep = "_") + ".prm"
 
         if os.path.isfile (model_fn) and os.path.isfile (training_data_fn) and os.path.isfile (best_params_fn)\
                 and os.path.isfile (kernel_params_fn):
@@ -724,21 +721,15 @@ if __name__ == "__main__":
 
             # 1) Load an existing model
             ranking_model = joblib.load (model_fn)
-            best_params = joblib.load (best_params_fn)
-            training_data = joblib.load (training_data_fn)
-            kernel_params_out = joblib.load (kernel_params_fn)
         else:
             print ("Compute ranking model ...")
             # 1) Train a model using all the available data and store the model to disk
-            ranking_model, best_params, training_data, kernel_params_out = train_model_using_all_data (
+            ranking_model, best_params = train_model_using_all_data (
                 training_systems = systems, predictor = predictor, pair_params = pair_params,
                 estimator = estimator, kernel_params = kernel_params, opt_params = opt_params,
                 input_dir = input_dir, feature_type = feature_type, n_jobs = n_jobs)
 
             joblib.dump (ranking_model, model_fn)
-            joblib.dump (best_params, best_params_fn)
-            joblib.dump (training_data, training_data_fn)
-            joblib.dump (kernel_params_out, kernel_params_fn)
 
         # Construct or load the candidate structure
         input_dir_candidates = base_dir + "/data/processed/Impact/candidates/"
@@ -750,8 +741,7 @@ if __name__ == "__main__":
         else:
             print ("Construct candidate graph ...")
             cand_data = build_candidate_structure (
-                model = {"ranking_model": ranking_model, "training_data": training_data,
-                         "kernel_params": kernel_params_out, "predictor": predictor},
+                model = {"ranking_model": ranking_model, "predictor": predictor},
                 input_dir_candidates = input_dir_candidates,
                 n_jobs = n_jobs, verbose = debug * 5)
 

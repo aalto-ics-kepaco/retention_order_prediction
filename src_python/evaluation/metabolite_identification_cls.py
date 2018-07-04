@@ -32,16 +32,40 @@ def train_model_using_all_data (
     Taks: Train a RankSVM model that uses all provided data for training. The hyper-parameter
           are chosen using cross-validation on that training set.
 
-    :param training_systems: list of string, containing the names of systems used.
-    :param predictor:
-    :param pair_params:
-    :param kernel_params:
-    :param opt_params:
-    :param input_dir:
-    :param estimator:
-    :param feature_type:
-    :param n_jobs:
-    :return:
+    :param training_systems: list of strings, containing the training systems
+
+    :param predictor: list of string, containing the predictors / molecular features used for the
+        model construction.
+
+    :param pair_params: dictionary, containing the paramters used for the creation of
+        the RankSVM learning pairs, e.g. minimum and maximum oder distance.
+
+    :param kernel_params: dictionary, containing the parameters for the kernels and
+        generally for handling the input features / predictors. See definition of the
+        dictionary in the __main__ of file 'evaluation_scenario_cls.py'.
+
+    :param opt_params: dictionary, containing the paramters controlling the hyper-paramter
+        optimization, number of cross-validation splits, etc. See definition of the
+        dictionary in the __main__ of file 'evaluation_scenario_cls.py'.
+
+    :param input_dir: string, directory containing the input data, e.g., fingerprints and retention
+        times.
+
+    :param estimator: string, order predictor to use: either "ranksvm" or "svr".
+
+    :param feature_type: string, feature type that is used for the RankSVM. Currently
+        only 'difference' features are supported, i.e., \phi_j - \phi_i is used for
+        the decision. If the estimator is not RankSVM, but e.g. Support Vector Regression,
+        than tis parameter can be set to None and is ignored.
+
+    :param n_jobs: integer, number of jobs used for the hyper-parameter estimation. The maximum number
+        of used jobs, is the number of inner splits (cross-validation or random split)!
+
+    :return: tuple
+
+        1) ranking_model: KernelRankSVC estimator object
+        2) best_params: dictionary, containing combination of best parameters
+            E.g.: {"C": 1, "gamma": 0.25}
     """
 
     # Number of cv-splits used for the parameters estimated
@@ -155,22 +179,17 @@ def train_model_using_all_data (
     # Train the model
     start_time = time.time()
 
-    best_params, cv_results, n_train_pairs, ranking_model, X_train, _ = find_hparan_ranksvm (
+    best_params, cv_results, n_train_pairs, ranking_model, _, _ = find_hparan_ranksvm (
         estimator = KernelRankSVC (kernel = kernel, slack_type = slack_type, random_state = 319),
         fold_score_aggregation = "weighted_average", X = d_features_training, y = d_rts_training,
         param_grid = param_grid, cv = GroupKFold (n_splits = n_splits_cv), pair_params = pair_params,
         n_jobs = n_jobs, scaler = scaler, all_pairs_as_test = all_pairs_for_test)
 
-    # NOTE: X_train and X_C_train (if not None) are already transformed using the specified scaler.
-
     rtime_gcv = time.time() - start_time
     print ("[find_hparam_*] %.3fsec" % rtime_gcv)
     print (DataFrame (cv_results))
 
-    # Create dictionaries used by the graph building interface
-    training_data = {"X_train": X_train, "X_C_train": None}
-
-    return ranking_model, best_params, training_data, kernel_params
+    return ranking_model, best_params
 
 def build_candidate_structure (
         model, input_dir_candidates, n_jobs = 1, verbose = False, debug = False):
@@ -218,6 +237,7 @@ def build_candidate_structure (
 
 def shortest_path (cand_data, weight_fun, cut_off_n_cand = np.inf, check_input = False, **kwds):
     """
+    Shortest path algorithm to find best metabolite assignment. See Algorithm 1 in the paper.
 
     :param cand_data:
     :param weight_fun:

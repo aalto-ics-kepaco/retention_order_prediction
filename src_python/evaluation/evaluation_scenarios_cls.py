@@ -74,6 +74,13 @@ def evaluate_on_target_systems (
     :param input_dir: string, directory containing the input data, e.g., fingerprints and retention
         times.
 
+    :param estimator: string, order predictor to use: either "ranksvm" or "svr".
+
+    :param feature_type: string, feature type that is used for the RankSVM. Currently
+        only 'difference' features are supported, i.e., \phi_j - \phi_i is used for
+        the decision. If the estimator is not RankSVM, but e.g. Support Vector Regression,
+        than tis parameter can be set to None and is ignored.
+
     :param n_jobs: integer, number of jobs used for the hyper-parameter estimation. The maximum number
         of used jobs, is the number of inner splits (cross-validation or random split)!
 
