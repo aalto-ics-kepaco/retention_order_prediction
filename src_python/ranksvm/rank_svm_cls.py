@@ -456,13 +456,14 @@ def load_data (input_dir, system = None, predictor = ["desc"], pred_fn = None,
 
     :param predictor: list of string, containing the predictors that should be loaded:
         E.g.:
-            If predictor = ["maccs","pubchem"], than all columns from 'fps.csv' are extracted
-            that contain bits from those two definitions.
-            If predictor = ["maccs"], than only the MACCS columns, i.e., "maccs_1", ..., "maccs_166",
-            are loaded.
+            - If predictor = ["maccs","pubchem"], than all columns from 'fps.csv' are extracted
+              that contain bits from those two definitions.
+            - If predictor = ["maccs"], than only the MACCS columns, i.e., "maccs_1", ..., "maccs_166",
+              are loaded.
 
     :param pred_fn: string, filename of the file containing the predictors (default = None). If the
         its value is None, than the predictor filename is determined automatically:
+
         - If the predictors == "desc" or any if the predictors is in the list of predefined molecular
           descriptors, than the file "desc.csv" is loaded.
         - Otherweise the file "fps.csv" is loaded.
@@ -476,8 +477,9 @@ def load_data (input_dir, system = None, predictor = ["desc"], pred_fn = None,
         scipy.stats.rankdata? (default = False)
 
     :return: (pandas.DataFrame, pandas.DataFrame)-tuple
-        (1) pandas.DataFrame({"retention times": [...], "inchi": [...], "system": [...]})
-        (2) pandas.DataFrame({"inchi", [...], "fp_1", [...], "fp_2", [...], ..., "fp_N", [...]})
+
+        1) pandas.DataFrame({"retention times": [...], "inchi": [...], "system": [...]})
+        2) pandas.DataFrame({"inchi", [...], "fp_1", [...], "fp_2", [...], ..., "fp_N", [...]})
 
         NOTE: Retention times and features are sorted with respect to their corresponding InChI.
     """

@@ -32,11 +32,6 @@ from sklearn.model_selection import ShuffleSplit
 ## Load some helper functions
 from helper_cls import dict2str
 
-
-'''
-SUB ROUTINES
-'''
-
 def parse_sysargs (arguments):
     """
     Task: Parser for the system arguments passed during the script-call, e.g.:
@@ -736,8 +731,9 @@ if __name__ == "__main__":
             print ("Compute ranking model ...")
             # 1) Train a model using all the available data and store the model to disk
             ranking_model, best_params, training_data, kernel_params_out = train_model_using_all_data (
-                training_systems = systems, predictor = predictor, pair_params = pair_params, estimator = estimator,
-                kernel_params = kernel_params, opt_params = opt_params, input_dir = input_dir, feature_type = feature_type, n_jobs = n_jobs)
+                training_systems = systems, predictor = predictor, pair_params = pair_params,
+                estimator = estimator, kernel_params = kernel_params, opt_params = opt_params,
+                input_dir = input_dir, feature_type = feature_type, n_jobs = n_jobs)
 
             joblib.dump (ranking_model, model_fn)
             joblib.dump (best_params, best_params_fn)

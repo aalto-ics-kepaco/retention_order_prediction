@@ -38,24 +38,63 @@ def evaluate_on_target_systems (
         target_systems, training_systems, predictor, pair_params, kernel_params, opt_params, input_dir, estimator,
         feature_type, n_jobs = 1, perc_for_training = 100):
     """
-    Task: Evaluate rank-correlation, accuracy, etc. by learning a ranking SVM
-          using the given set of training systems and prediction on the given
-          set of target systems.
+    Task: Evaluate rank-correlation, accuracy, etc. by learning an order predictor using the given
+          set of training systems and prediction on the given set of target systems.
 
-          Leave-n-out works now on the molecular structures only, i.e. during
-          the learning, the training molecular structures (regardless of the
-          system they have been measured with), will not be part of the test
-          set.
+          For the evaluation we use either a repeated random-split of the target systems' data
+          (if less than 75 examples are provided for test) or a cross-validation (else). The
+          hyper-paramters of the order predictor are optimized using a nested cross-validation.
+          The routines for that can be found in the file 'model_selection_cls.py'.
 
-    :param target_systems:
-    :param training_systems:
-    :param predictor:
-    :param pair_params:
-    :param kernel_params:
-    :param opt_params:
-    :param input_dir:
-    :param n_jobs:
-    :return:
+          If desired (excl_mol_by_struct_only == True), the molecular structures from the test set
+          are removed from the training based on their molecular structure, e.g. by comparison of
+          their InChIs, _even_ if these structures have been measured with another than the
+          target system, i.e., another chromatographic system.
+
+          See also the paper for details on the evaluation strategy.
+
+    :param target_systems: list of strings, containing the target systems
+
+    :param training_systems: list of strings, containing the training systems
+
+    :param predictor: list of string, containing the predictors / molecular features used for the
+        model construction.
+
+    :param pair_params: dictionary, containing the paramters used for the creation of
+        the RankSVM learning pairs, e.g. minimum and maximum oder distance.
+
+    :param kernel_params: dictionary, containing the parameters for the kernels and
+        generally for handling the input features / predictors. See definition of the
+        dictionary in the __main__ of file 'evaluation_scenario_cls.py'.
+
+    :param opt_params: dictionary, containing the paramters controlling the hyper-paramter
+        optimization, number of cross-validation splits, etc. See definition of the
+        dictionary in the __main__ of file 'evaluation_scenario_cls.py'.
+
+    :param input_dir: string, directory containing the input data, e.g., fingerprints and retention
+        times.
+
+    :param n_jobs: integer, number of jobs used for the hyper-parameter estimation. The maximum number
+        of used jobs, is the number of inner splits (cross-validation or random split)!
+
+    :param perc_for_training: scalar, percentage of the target systems data, that is
+        used for the training, e.g., selected by simple random sub-sampling. This value
+        only effects the training process, of the target system is in the set of training
+        systems.
+
+    :return: tuple of pandas.DataFrame
+
+        1) mapped_values: predicted order scores for each target system
+            - corresponds to: w^\phi_i in the RankSVM case
+            - corresponds to: the predicted retention time, in the SVR case
+        2) correlations: rank correlations of the order scores for each target system
+        3) accuracies: pairwise prediction accuracies for each target system
+        4) simple_statistics: number of training and test examples, etc.
+        5) grid_search_results: hyper-parameter scores for the different grid-parameters
+        6) grid_search_best_params: hyper-parameter scores for the best grid-parameters
+
+        NOTE: The returned results (except mapped_values and grid search results) are averages
+              across the different random splits / crossvalidation folds and repetitions.
     """
 
     # Variables related to the number of random / cv splits, for inner (*_cv)
