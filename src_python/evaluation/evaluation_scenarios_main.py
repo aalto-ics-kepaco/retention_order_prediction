@@ -1,3 +1,11 @@
+'''
+Main script to run the evaluations presented in the publication:
+
+    Liquid-Chromatography Retention Order Prediction for Metabolite Identification,
+    Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu,
+    ...
+'''
+
 import sys
 import os
 import json
@@ -24,22 +32,154 @@ from sklearn.model_selection import ShuffleSplit
 ## Load some helper functions
 from helper_cls import dict2str
 
+
+'''
+SUB ROUTINES
+'''
+
+def parse_sysargs (arguments):
+    """
+    Task: Parser for the system arguments passed during the script-call, e.g.:
+        - Which experiment (here called scenario) should be ran?
+        - Which estimator should be used?
+        - Which set of systems (contained in the dataset) should be used?
+        - Which concrete configuration of the estimator, features, etc. should be used?
+
+    :return: parsed parameters
+    """
+    # Which estimator should be used? Currently available: "ranksvm" and "svr".
+    estimator = arguments[1]
+
+    # Which experiment / scenario should be ran?
+    scenario = arguments[2]          # {baseline, ...}
+
+    # Which set of target systems should be considered?
+    # For the experiments in:
+    # - Section 3.1 in the paper, we use sysset = 10
+    # - Section 3.2 in the paper, we use sysset = 10, 10_imp and imp
+    sysset = arguments[3]            # {set=all, set=1, ...}
+
+    # Index of the target system for which the evaluation should be performed.
+    # This parameter is ment to be used for parallelization. That means, one
+    # can run a job for each target system in the system set separetly instead
+    # running all within the same job (if tsysidx == -1).
+    tsysidx = eval (arguments[4])    # {-1,0,...,|sysset|-1},
+
+    # Read the config file that defines the 'data', 'model', and paramters for the
+    # metaboloite identification 'application'.
+    with open (arguments[5]) as config_file:
+        d_config = json.load (config_file)
+
+        ## Which _data_ should be used?
+        base_dir = d_config["data"]["base_dir"]
+        dataset = d_config["data"]["dataset"] # e.g. PredRet/v2
+        systems = d_config["data"]["systems"][sysset]
+        excl_mol_by_struct_only = d_config["data"]["excl_mol_by_struct_only"]
+
+        ## Which _model_ should be used?
+        # RankSVM
+        if estimator == "ranksvm":
+            pair_params = d_config["model"]["ranksvm"]["pair_params"]
+            feature_type = "difference"
+            slack_type = "on_pairs"
+        else:
+            pair_params = None
+            feature_type = None
+            slack_type = None
+
+        # Molecule representation
+        kernel = d_config["model"]["molecule_representation"]["kernel"]
+        predictor = d_config["model"]["molecule_representation"]["predictor"]
+        feature_scaler = d_config["model"]["molecule_representation"]["feature_scaler"]
+        poly_feature_exp = d_config["model"]["molecule_representation"]["poly_feature_exp"]
+
+        # Parameters for the model selection
+        all_pairs_for_test = d_config["model"]["modelselection"]["all_pairs_for_test"]
+
+        # Parameters for the candidate re-ranking
+        dp_weight_function = d_config["application"]["candidate_reranking"]["dp_weight_function"]
+        use_log_reranking = d_config["application"]["candidate_reranking"]["use_log"]
+
+    # How many jobs can we run in parallel? The number of jobs is only used for
+    # the hyper-parameter estimation.
+    n_jobs = eval (arguments[6])
+
+    # Do we run in debug-mode?
+    # The debug-mode can be used to test, whether all parts of the evaluation:
+    #
+    #   1) Loading the data
+    #   2) Model estimation
+    #   3) Model evaluation
+    #   4) Saving of the results
+    #
+    # is working properly. The main difference between debug- and "normal"-mode is,
+    # that in the debug mode the number of cross-validation splits, the number of
+    # repitions (of the cross-validation) and the grid of hyper-paramters is reduced.
+    # Furthermore, the results are stored in a folder ".../debug/..." rather than
+    # ".../final/...".
+    debug = eval (arguments[7])
+
+    return scenario, sysset, tsysidx, base_dir, dataset, systems, pair_params, feature_type, predictor,\
+           feature_scaler, kernel, n_jobs, debug, estimator, excl_mol_by_struct_only, poly_feature_exp,\
+           slack_type, all_pairs_for_test, dp_weight_function, use_log_reranking
+
+
 def evaluate_system_pairs (
         training_systems, target_systems, input_dir, predictor, n_jobs, feature_type, pair_params,
         kernel_params, opt_params, estimator):
     """
-    Run the evaluation on pairs (s_1, s_2) of systems. For that each system
-    is used as training and target system.
+    Given a set of training systems S1 and target systems S2, the evaluation is run on
+    all pairs in (training, target) \in S1 x S2. If S1 = S2, we can evaluate how good
+    each systems can predict each others system.
 
-    :param systems: list of string, names of the chromatographic systems
-    :param input_dir: string, directory containing the input features and retention times
-    :param output_dir: string, directory to store the results
-    :param predictor:
-    :param n_jobs:
-    :param feature_type:
-    :param pair_params:
-    :param kernel_params:
-    :return:
+    :param training_systems: list of strings, system-ids used for training:
+        E.g.: ["FEM_long", "RIKEN"]
+
+    :param target_systems: list of strings, systems-ids used as target systems, i.e.,
+        in which the performance is evaluted.
+
+    :param input_dir: string, directory containing the pre-processed dataset under
+        investigation.
+        E.g.: 'base_dir + "/data/processed/" + dataset + "/"', with dataset = "PredRet/v2"
+
+    :param predictor: list of string, predictors used for the model training.
+        E.g.: ["maccs", "circular"] --> both MACCS and circular fingerprints are used
+              ["maccs"]             --> only MACCS fingerprints are used
+
+    :param n_jobs: integer, number of jobs used for the parallelization. Several jobs are
+        primarily used for hyper-parameter estimation of the order predictor. See
+        'model_selection_cls.py' for details.
+
+    :param feature_type: string, feature type that is used for the RankSVM. Currently
+        only 'difference' features are supported, i.e., \phi_j - \phi_i is used for
+        the decision. If the estimator is not RankSVM, but e.g. Support Vector Regression,
+        than tis parameter can be set to None and is ignored.
+
+    :param pair_params: dictionary, containing the paramters used for the creation of
+        the RankSVM learning pairs, e.g. minimum and maximum oder distance.
+
+    :param kernel_params: dictionary, containing the parameters for the kernels and
+        generally for handling the input features / predictors. See definition of the
+        dictionary in the __main__ of this file.
+
+    :param opt_params: dictionary, containing the paramters controlling the hyper-paramter
+        optimization, number of cross-validation splits, etc. See definition of the
+        dictionary in the __main__ of this file.
+
+    :param estimator: string, estimator used for the order learning. Currently available
+        are: "ranksvm" and "svr".
+
+    :return: dictionary, containing the aggregated evalation results:
+        "correlation": pandas.DataFrame, rank correlation of predicted retention scores
+            and observed retention times, for each (training, target)-system pair.
+        "accuracy": pandas.DataFrame, pairwise order prediction accuracy, for each
+            (training, target)-system pair.
+        "simple_statistics": pandas.DataFrame, e.g., number of training and test
+            examples respectively pairs (and other things), for each (training, target)-pair.
+        "grid_search_results": pandas.DataFrame, scores for different hyper-parameters
+            during the optimization for each (training, target)-pair
+        "grid_search_best_params": pandas.DataFrame, best / selected hyper-parameters
+            during the optimization for each (training, target)-pair
     """
     correlations, accuracies, simple_statistics = DataFrame(), DataFrame(), DataFrame()
     grid_search_results, grid_search_best_params = DataFrame(), DataFrame()
@@ -64,10 +204,74 @@ def evaluate_system_pairs (
 
     return results
 
+
 def evaluate_all_on_one (
         training_systems, target_systems, leave_target_system_out, input_dir,
         predictor, n_jobs, feature_type, pair_params, kernel_params, opt_params, estimator,
         perc_for_training = 100):
+    """
+    This function iterates over all specified target systems and runs the evalation using
+    them while a set of training systems is used to learn the model. Here the target system
+    can be part of the training and is excluded if desired.
+
+    :param training_systems: list of strings, system-ids used for training:
+        E.g.: ["FEM_long", "RIKEN"]
+
+    :param target_systems: list of strings, systems-ids used as target systems, i.e.,
+        in which the performance is evaluted.
+
+    :param leave_target_system_out: boolean, should the target system under evaluation
+        be excluded from the training, if it is contained in that set?
+
+    :param input_dir: string, directory containing the pre-processed dataset under
+        investigation.
+        E.g.: 'base_dir + "/data/processed/" + dataset + "/"', with dataset = "PredRet/v2"
+
+    :param predictor: list of string, predictors used for the model training.
+        E.g.: ["maccs", "circular"] --> both MACCS and circular fingerprints are used
+              ["maccs"]             --> only MACCS fingerprints are used
+
+    :param n_jobs: integer, number of jobs used for the parallelization. Several jobs are
+        primarily used for hyper-parameter estimation of the order predictor. See
+        'model_selection_cls.py' for details.
+
+    :param feature_type: string, feature type that is used for the RankSVM. Currently
+        only 'difference' features are supported, i.e., \phi_j - \phi_i is used for
+        the decision. If the estimator is not RankSVM, but e.g. Support Vector Regression,
+        than tis parameter can be set to None and is ignored.
+
+    :param pair_params: dictionary, containing the paramters used for the creation of
+        the RankSVM learning pairs, e.g. minimum and maximum oder distance.
+
+    :param kernel_params: dictionary, containing the parameters for the kernels and
+        generally for handling the input features / predictors. See definition of the
+        dictionary in the __main__ of this file.
+
+    :param opt_params: dictionary, containing the paramters controlling the hyper-paramter
+        optimization, number of cross-validation splits, etc. See definition of the
+        dictionary in the __main__ of this file.
+
+    :param estimator: string, estimator used for the order learning. Currently available
+        are: "ranksvm" and "svr".
+
+    :param perc_for_training: scalar, percentage of the target systems data, that is
+        used for the training, e.g., selected by simple random sub-sampling. This value
+        only effects the training process, of the target system is in the set of training
+        systems.
+
+    :return: dictionary, containing the aggregated evalation results:
+        "correlation": pandas.DataFrame, rank correlation of predicted retention scores
+            and observed retention times, for each (training, target)-system pair.
+        "accuracy": pandas.DataFrame, pairwise order prediction accuracy, for each
+            (training, target)-system pair.
+        "simple_statistics": pandas.DataFrame, e.g., number of training and test
+            examples respectively pairs (and other things), for each (training, target)-pair.
+        "grid_search_results": pandas.DataFrame, scores for different hyper-parameters
+            during the optimization for each (training, target)-pair
+        "grid_search_best_params": pandas.DataFrame, best / selected hyper-parameters
+            during the optimization for each (training, target)-pair
+    """
+
     correlations, accuracies, simple_statistics = DataFrame(), DataFrame(), DataFrame()
     grid_search_results, grid_search_best_params = DataFrame(), DataFrame()
 
@@ -99,9 +303,70 @@ def evaluate_all_on_one (
 
     return results
 
+
 def evaluate_single_on_one (
         systems, input_dir, predictor, n_jobs, feature_type, pair_params, kernel_params, opt_params,
         estimator, perc_for_training = 100):
+    """
+    Run the evaluation for a set of systems S1 for all pairs like:
+
+        (training_system = s_i, target_system = s_i) with s_i \in S1,
+
+    that means, the prediction performence of each system using it self for the model
+    training is evalauted.
+
+    :param systems: list of strings, system-ids used for training and as target:
+        E.g.: ["FEM_long", "RIKEN"]
+
+    :param input_dir: string, directory containing the pre-processed dataset under
+        investigation.
+        E.g.: 'base_dir + "/data/processed/" + dataset + "/"', with dataset = "PredRet/v2"
+
+    :param predictor: list of string, predictors used for the model training.
+        E.g.: ["maccs", "circular"] --> both MACCS and circular fingerprints are used
+              ["maccs"]             --> only MACCS fingerprints are used
+
+    :param n_jobs: integer, number of jobs used for the parallelization. Several jobs are
+        primarily used for hyper-parameter estimation of the order predictor. See
+        'model_selection_cls.py' for details.
+
+    :param feature_type: string, feature type that is used for the RankSVM. Currently
+        only 'difference' features are supported, i.e., \phi_j - \phi_i is used for
+        the decision. If the estimator is not RankSVM, but e.g. Support Vector Regression,
+        than tis parameter can be set to None and is ignored.
+
+    :param pair_params: dictionary, containing the paramters used for the creation of
+        the RankSVM learning pairs, e.g. minimum and maximum oder distance.
+
+    :param kernel_params: dictionary, containing the parameters for the kernels and
+        generally for handling the input features / predictors. See definition of the
+        dictionary in the __main__ of this file.
+
+    :param opt_params: dictionary, containing the paramters controlling the hyper-paramter
+        optimization, number of cross-validation splits, etc. See definition of the
+        dictionary in the __main__ of this file.
+
+    :param estimator: string, estimator used for the order learning. Currently available
+        are: "ranksvm" and "svr".
+
+    :param perc_for_training: scalar, percentage of the target systems data, that is
+        used for the training, e.g., selected by simple random sub-sampling. This value
+        only effects the training process, of the target system is in the set of training
+        systems.
+
+    :return: dictionary, containing the aggregated evalation results:
+        "correlation": pandas.DataFrame, rank correlation of predicted retention scores
+            and observed retention times, for each (training, target)-system pair.
+        "accuracy": pandas.DataFrame, pairwise order prediction accuracy, for each
+            (training, target)-system pair.
+        "simple_statistics": pandas.DataFrame, e.g., number of training and test
+            examples respectively pairs (and other things), for each (training, target)-pair.
+        "grid_search_results": pandas.DataFrame, scores for different hyper-parameters
+            during the optimization for each (training, target)-pair
+        "grid_search_best_params": pandas.DataFrame, best / selected hyper-parameters
+            during the optimization for each (training, target)-pair
+    """
+
     correlations, accuracies, simple_statistics = DataFrame(), DataFrame(), DataFrame()
     grid_search_results, grid_search_best_params = DataFrame(), DataFrame()
 
@@ -125,77 +390,39 @@ def evaluate_single_on_one (
 
     return results
 
-def parse_sysargs (arguments):
-    """
-    Task: Parser for the system arguments passed during the script-call. If no arguments are provided
-          the experimental parameters are set to some default values, e.g. suitable for debugging.
-
-    :return:
-    """
-    # Which estimator should be used, e.g. ranksvm (default), kernelridge, svr, ...?
-    estimator = arguments[1]
-
-    ## Which _evaluation_ should done?
-    scenario = arguments[2]          # {baseline, ...}
-    sysset = arguments[3]            # {set=all, set=1, ...}
-    tsysidx = eval (arguments[4])    # {-1,0,...,|sysset|-1},
-                                     #     If -1 all target systems are considered without parallelization.
-
-    # Leave-target-system-out: This only effects the scenarios 'on_one' and 'selected_scenarios'.
-    # Therefore we will run 'ltso' in {True, False} by default, i.e. both settings are ran when
-    # the evaluation is started.
-
-    # Read the config file that defines the 'data' and the 'model'.
-    with open (arguments[5]) as config_file:
-        d_config = json.load (config_file)
-
-        ## Which _data_ should be used?
-        base_dir = d_config["data"]["base_dir"]
-        dataset = d_config["data"]["dataset"]
-        systems = d_config["data"]["systems"][sysset]
-        excl_mol_by_struct_only = d_config["data"]["excl_mol_by_struct_only"]
-
-        ## Which _model_ should be used?
-        # RankSVM
-        if estimator == "ranksvm":
-            pair_params = d_config["model"]["ranksvm"]["pair_params"]
-            feature_type = "difference"
-            slack_type = "on_pairs"
-        else:
-            pair_params = None
-            feature_type = None
-            slack_type = None
-
-        # Molecule representation
-        kernel = d_config["model"]["molecule_representation"]["kernel"]
-        predictor = d_config["model"]["molecule_representation"]["predictor"]
-        feature_scaler = d_config["model"]["molecule_representation"]["feature_scaler"]
-        poly_feature_exp = d_config["model"]["molecule_representation"]["poly_feature_exp"]
-
-        # Parameters for the model selection
-        all_pairs_for_test = d_config["model"]["modelselection"]["all_pairs_for_test"]
-
-        # Parameters for the candidate re-ranking
-        dp_weight_function = d_config["application"]["candidate_reranking"]["dp_weight_function"]
-        use_log_reranking = d_config["application"]["candidate_reranking"]["use_log"]
-
-    # How many jobs can we run in parallel?
-    n_jobs = eval (arguments[6])
-
-    # Do we run in debug-mode?
-    debug = eval (arguments[7])
-
-    return scenario, sysset, tsysidx, base_dir, dataset, systems, pair_params, feature_type, predictor,\
-           feature_scaler, kernel, n_jobs, debug, estimator, excl_mol_by_struct_only, poly_feature_exp,\
-           slack_type, all_pairs_for_test, dp_weight_function, use_log_reranking
 
 def write_out_results (output_dir, ofile_prefix, param_suffixes, results):
+    """
+    Write the results to the disk. The output filename is compiled in the following way:
+
+        output_dir + "/" + prefix + "_" + dataframe_type + "_" + suffix.csv,
+
+    with:
+        prefix: string, can be used to index results computed in parallel, e.g. "_00", "_01", ...
+        dataframe_type: string, \in {"accuracies", "correlations", ...} (see 'evaluate_system_pairs', etc.)
+        suffix: string, identifies the "flavor" of the experiment, e.g. "_embso=False" (are molecules
+            excluded from the training those structure in the test), ...
+
+    :param output_dir: string, output directory for the results.
+
+    :param ofile_prefix: string, id of the result for example primarily used to allow
+        parallelization
+
+    :param param_suffixes: dictionary, containing the "flavors" of the experiment:
+        E.g.: {"use_feature_scaler": True, "exclude_molecules_from_training_based_on_structure": False, ...}
+
+    :param results: dictionary, containing the results to be written out (compare also
+        e.g. 'evaluate_system_pairs'):
+        keys: strings, type of result, e.g. "accuracies"
+        value: pandas.DataFrane, containing the actual results in a table
+    """
     CSV_SEP = "\t"
     CSV_FLOAT_FORMAT = "%.4f"
 
     for key, value in results.items():
         ofile = output_dir + "/" + ofile_prefix + key + "_" + dict2str (param_suffixes, sep = "_") + ".csv"
         value.to_csv (ofile, index = False, sep = CSV_SEP, float_format = CSV_FLOAT_FORMAT)
+
 
 if __name__ == "__main__":
     # Directory structure of the results:
@@ -241,12 +468,27 @@ if __name__ == "__main__":
         os.makedirs (output_dir)
 
     ## Kernel and optimization parameters
+    # Note:
+    # - Outer splits used for model evaluation.
+    # - Inner splits used for hyper-paramter optimization.
     if debug:
-        opt_params = {"C": [0.1, 1, 10], "epsilon": [0.025, 0.1, 0.5, 1.0],
-                      "n_splits_shuffle": 3, "n_splits_nshuffle": 3,
-                      "n_splits_cv": 3, "n_splits_ncv": 3,
-                      "n_rep": 2, "excl_mol_by_struct_only": excl_mol_by_struct_only,
-                      "slack_type": slack_type, "all_pairs_for_test": all_pairs_for_test}
+        opt_params = {"C":                       [0.1, 1, 10],              # regularization paramter grid
+                      "epsilon":                 [0.025, 0.1, 0.5, 1.0],    # SVR error-tube paramter grid
+                      "n_splits_shuffle":        3,                         # number of outer random splits
+                                                                            # (< 75 test examples)
+                      "n_splits_nshuffle":       3,                         # number of inner random splits
+                                                                            # (< 75 test examples)
+                      "n_splits_cv":             3,                         # number of outer cross-validation
+                                                                            # (>= 75 test examples)
+                      "n_splits_ncv":            3,                         # number of inner cross-validation
+                                                                            # (>= 75 test examples)
+                      "n_rep":                   2,                         # number of repetitions of the
+                                                                            # model evaluation (averaged sub-
+                                                                            # sequently).
+                      "excl_mol_by_struct_only": excl_mol_by_struct_only,
+                      "slack_type":              slack_type,
+                      "all_pairs_for_test":      all_pairs_for_test}        # See 'find_hparan_ranksvm' in the
+                                                                            # model_selection_cls.py.
 
         kernel_params = {"kernel": kernel, "gamma": [0.1, 0.25, 0.5, 1, 2, 3],
                          "scaler": feature_scaler, "poly_feature_exp": poly_feature_exp}
@@ -271,7 +513,28 @@ if __name__ == "__main__":
                             "use_sign": [False], "topk": 1, "cut_off_n_cand": 300, "n_rep": 1000,
                             "epsilon_rt": 0, "min_rt_delta_range": [0], "use_log": use_log_reranking}
 
+    # In the following let us assume we are given a dataset with 3 different systems: s_1, s_2 and s_3
     if scenario == "baseline":
+        # Baseline results: Single system is used for training the order predictor and the
+        #                   performance is evaluated in all available target systems.
+        #
+        # E.g. pairwise prediction accuracy (matrix):
+        #
+        # training system / target system --->
+        #  |
+        #  V
+        #       s_1     s_2     s_3
+        # s_1 acc_11  acc_12  acc_13
+        # s_2 acc_21  acc_22  acc_23
+        # s_3 acc_31  acc_32  acc_33
+        #
+        # In the paper: Section 3.1 (3.1.3, 3.1.4), Table 3 (target system == training system),
+        #               Table 4 (single system setting)
+        #
+        # Note: In the paper we only present the diagonal of the accuracy matrix.
+        #       Therefore one can also use the "baseline_single" scenario in order
+        #       to save computation time, for reproduction.
+
         # Run evaluation
         tsystems = systems if tsysidx == -1 else systems[tsysidx]
         results = evaluate_system_pairs (
@@ -285,6 +548,35 @@ if __name__ == "__main__":
         write_out_results (output_dir, ofile_prefix, param_suffixes, results)
 
     elif scenario == "all_on_one":
+        # Multiple training systems: All the available systems are used to train the order predictor
+        #                            in a _single_ model. The evaluation is subsequently performed on
+        #                            each available (target) system. In this scenario two cases are
+        #                            considered jointly: leave-target-system-out (ltso) from training
+        #                            [True, False].
+        #
+        # E.g. pairwise prediction accuracy (matrix):
+        #
+        # training system / target system --->
+        #  |
+        #  V
+        #
+        # If: ltso = False
+        #
+        #                 s_1     s_2     s_3
+        # {s_1,s_2,s_3} acc_*1  acc_*2  acc_*3
+        #
+        # If: ltso = True
+        #
+        #                 s_1     s_2     s_3
+        # {s_2,s_3}     acc_-11    -       -
+        # {s_1,s_3}        -    acc_-22    -
+        # {s_2,s_3}        -       -    acc_-33
+        #
+        # In the paper: In Section 3.1.4 we evaluate the performance of the RankSVM order prediction
+        #               in the "Multiple systems for training" case. 'all_on_one' can be used to get
+        #               the results presented in Table 4 (Multiple systems, no target data; Multiple
+        #               systems, all data; ltso = True; ltso = False).
+
         for ltso in [True, False]:
             print ("Leave-target-system-out: %s" % str (ltso))
 
@@ -303,6 +595,35 @@ if __name__ == "__main__":
             write_out_results (output_dir, ofile_prefix, param_suffixes, results)
 
     elif scenario == "all_on_one_perc":
+        # Multiple training systems: All the available systems are used to train the order predictor
+        #                            in a _single_ model. The evaluation is subsequently performed on
+        #                            each available (target) system. In this scenario, one can vary the
+        #                            percentage of training data, that contributs to the model, comming
+        #                            from the target system.
+        #
+        # E.g. pairwise prediction accuracy (matrix):
+        #
+        # training system / target system --->
+        #  |
+        #  V
+        #                            s_1     s_2     s_3
+        # {s_1(  0%),s_2,s_3} acc_(  0%)1     -       -
+        # {s_1( 10%),s_2,s_3} acc_( 10%)1     -       -
+        #                               ...
+        # {s_1(100%),s_2,s_3} acc_(100%)1     -       -
+        # {s_1,(  0%)s_2,s_3}         -  acc_(  0%)2  -
+        # {s_1,( 10%)s_2,s_3}         -  acc_( 10%)2  -
+        #                               ...
+        # {s_1,(100%)s_2,s_3}         -  acc_(100%)2  -
+        # {s_1,s_2,(  0%)s_3}         -       - acc_(  0%)3
+        # {s_1,s_2,( 10%)s_3}         -       - acc_( 10%)3
+        #                               ...
+        # {s_1,s_2,(100%)s_3}         -       - acc_(100%)3
+        #
+        # In the paper: In Section 3.1.4 we evaluate the performance of the RankSVM order prediction
+        #               in the "Multiple systems for training" case. 'all_on_one' can be used to get
+        #               the results presented in Figure 4 (multiple systems).
+
         # Run evaluation
         tsystems = systems if tsysidx == -1 else [systems[tsysidx]]
 
@@ -320,6 +641,23 @@ if __name__ == "__main__":
             write_out_results (output_dir, ofile_prefix, param_suffixes, results)
 
     elif scenario == "baseline_single":
+        # Baseline results: Single system is used for training the order predictor and the
+        #                   performance is evaluated in the training systems.
+        #
+        # E.g. pairwise prediction accuracy (matrix):
+        #
+        # training system / target system --->
+        #  |
+        #  V
+        #       s_1     s_2     s_3
+        # s_1 acc_11     -       -
+        # s_2    -    acc_22     -
+        # s_3    -       -    acc_33
+        #
+        # In the paper: Section 3.1 (3.1.3, 3.1.4), Table 3 (target system == training system),
+        #               Table 4 (single system setting)
+
+        # Run evaluation
         tsystems = systems if tsysidx == -1 else [systems[tsysidx]]
         results = evaluate_single_on_one (
             systems = tsystems, input_dir = input_dir, predictor = predictor, n_jobs = n_jobs,
@@ -332,8 +670,33 @@ if __name__ == "__main__":
         write_out_results (output_dir, ofile_prefix, param_suffixes, results)
 
     elif scenario == "baseline_single_perc":
-        tsystems = systems if tsysidx == -1 else [systems[tsysidx]]
+        # Baseline results: Single system is used for training the order predictor and the
+        #                   performance is evaluated in the training systems. We can vary
+        #                   the percentage of target system data used for training
+        #
+        # E.g. pairwise prediction accuracy (matrix):
+        #
+        # training system / target system --->
+        #  |
+        #  V
+        #                  s_1     s_2     s_3
+        # ( 10%)s_1 acc_( 10%)1     -       -
+        # ( 20%)s_1 acc_( 20%)1     -       -
+        #                       ...
+        # (100%)s_1 acc_(100%)1     -       -
+        # ( 10%)s_2         -  acc_( 10%)2  -
+        # ( 20%)s_2         -  acc_( 20%)2  -
+        #                       ...
+        # (100%)s_2         -  acc_(100%)2  -
+        # ( 10%)s_3         -       -  acc_( 10%)3
+        # ( 20%)s_3         -       -  acc_( 20%)3
+        #                       ...
+        # (100%)s_3         -       -  acc_(100%)3
+        #
+        # In the paper: Section 3.1 (3.1.3, 3.1.3), Figure 4 (Single system).
 
+        # Run evaluation
+        tsystems = systems if tsysidx == -1 else [systems[tsysidx]]
         for perc_for_training in range (10, 110, 10):
             results = evaluate_single_on_one (
                 systems = tsystems, input_dir = input_dir, predictor = predictor, n_jobs = n_jobs,
@@ -410,7 +773,7 @@ if __name__ == "__main__":
         assert (len (rts) == len (wtx))
 
         if dp_weight_function == "pwmax":
-            wfun = _weight_func_max # used in the Paper
+            wfun = _weight_func_max # used in the Paper (see Section 2.3.2)
         else:
             raise ValueError ("Invalid weight function for the dynamic programming: "
                               "%s" % dp_weight_function)
