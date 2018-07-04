@@ -20,7 +20,7 @@ from pandas import DataFrame, concat
 from evaluation_scenarios_cls import evaluate_on_target_systems
 
 ## Load function related to the metabolite identification
-from evaluation_scenarios_cls import perform_reranking_of_candidates, _weight_func_max, \
+from metabolite_identification_cls import perform_reranking_of_candidates, _weight_func_max, \
     build_candidate_structure, train_model_using_all_data
 
 from rank_svm_cls import get_pairs_single_system

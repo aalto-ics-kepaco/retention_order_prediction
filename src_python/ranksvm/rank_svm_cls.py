@@ -415,8 +415,75 @@ def minmax_kernel_mat (X, Y = None):
 
 def load_data (input_dir, system = None, predictor = ["desc"], pred_fn = None,
                fps_as_minusone_and_one = False, verbose = False, rts_as_rank = False):
+    """
+    Function to load the retention time and molecular features / predictors for a given system
+    from the dataset.
+
+    :param input_dir: string, directoy containing the retention times and molecular features / predictors:
+        - rts.csv: cvs-file containing the retention times for the different molecules measured
+                   with the different systems:
+
+                   E.g.:
+                        "inchi","rt","system"
+                        "InChI=1S/C10H9N3O/c1-7-11-10...",5.1,"Eawag_XBridgeC18"
+                        "InChI=1S/C7H3Br2NO/c8-5-1-4...",8.3,"Eawag_XBridgeC18"
+                        ...
+                        "InChI=1S/C28H22O6/c29-20-7-2...",33.46,"FEM_long"
+                        "InChI=1S/C20H22O8/c21-10-16-17(24)18(25...",27.25,"FEM_long"
+                        ...
+                        "InChI=1S/C5H4N2O4/c8-3-1-2...",0.7188166667,"LIFE_old"
+                        "InChI=1S/C9H10N2O3/c10-7-3-1-6...",1.2945,"LIFE_old"
+
+                   NOTE: Within a single system, each InChI should be unique.
+                        ...
+          fps.csv: csv-file containing the fingerprints (used as molecular features) for the different
+                   molecules measured with the different systems.
+
+                   E.g.:
+                        "inchi","maccs_1","maccs_2",...,"maccs_166","pubchem_1","pubchem_2",...
+                        "InChI=1S/C10H9N3O/c1-7-11-10...",1,0,...,0,1,0,...
+                        "InChI=1S/C28H22O6/c29-20-7-2...",0,1,...,0,1,1,...
+                        ...
+
+                   NOTE 1: Here we assume that only the unique molecular structures are containing
+                           in the file, i.e. molecules that appear in several systems, only need to be
+                           represented ones.
+                   NOTE 2: Each column corresponds to a single (in this example) fingerprint bit
+                           from a certain fingerprint definition, e.g., MACCS or Pubchem.
+
+    :param system: string, system that should be loaded, if None, than all the systems
+        are loaded.
+
+    :param predictor: list of string, containing the predictors that should be loaded:
+        E.g.:
+            If predictor = ["maccs","pubchem"], than all columns from 'fps.csv' are extracted
+            that contain bits from those two definitions.
+            If predictor = ["maccs"], than only the MACCS columns, i.e., "maccs_1", ..., "maccs_166",
+            are loaded.
+
+    :param pred_fn: string, filename of the file containing the predictors (default = None). If the
+        its value is None, than the predictor filename is determined automatically:
+        - If the predictors == "desc" or any if the predictors is in the list of predefined molecular
+          descriptors, than the file "desc.csv" is loaded.
+        - Otherweise the file "fps.csv" is loaded.
+
+    :param fps_as_minusone_and_one: boolean, should binary fingerprints be transformed into {-1,1}
+        fingerprints, i.e., 0 = -1, 1 = 1. (default = False)
+
+    :param verbose: boolean, should the function print the number of loaded molecules? (default = False)
+
+    :param rts_as_rank: boolean, should the retention time converted into a dense rank using
+        scipy.stats.rankdata? (default = False)
+
+    :return: (pandas.DataFrame, pandas.DataFrame)-tuple
+        (1) pandas.DataFrame({"retention times": [...], "inchi": [...], "system": [...]})
+        (2) pandas.DataFrame({"inchi", [...], "fp_1", [...], "fp_2", [...], ..., "fp_N", [...]})
+
+        NOTE: Retention times and features are sorted with respect to their corresponding InChI.
+    """
     assert isinstance (predictor, list)
 
+    # Predefined set of molecular descriptors
     l_desc = ["ALOGPDescriptor.ALogP", "ALOGPDescriptor.ALogp2", "ALOGPDescriptor.AMR", "APolDescriptor.apol",
               "AutocorrelationDescriptorPolarizability.ATSp1", "AutocorrelationDescriptorPolarizability.ATSp2",
               "AutocorrelationDescriptorPolarizability.ATSp3", "AutocorrelationDescriptorPolarizability.ATSp4",

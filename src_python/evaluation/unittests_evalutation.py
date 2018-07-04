@@ -2,9 +2,9 @@ import unittest
 import numpy as np
 import copy
 
-from evaluation_scenarios_cls import build_candidate_structure, shortest_path, _weight_func_max
-from evaluation_scenarios_cls import shortest_path_exclude_candidates
-from evaluation_scenarios_cls import perform_reranking_of_candidates
+from metabolite_identification_cls import build_candidate_structure, shortest_path, _weight_func_max
+from metabolite_identification_cls import shortest_path_exclude_candidates
+from metabolite_identification_cls import perform_reranking_of_candidates
 
 from rank_svm_cls import tanimoto_kernel
 
