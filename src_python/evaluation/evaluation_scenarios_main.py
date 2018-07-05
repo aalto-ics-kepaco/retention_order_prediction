@@ -467,20 +467,29 @@ if __name__ == "__main__":
     # - Outer splits used for model evaluation.
     # - Inner splits used for hyper-paramter optimization.
     if debug:
-        opt_params = {"C":                       [0.1, 1, 10],              # regularization paramter grid
-                      "epsilon":                 [0.025, 0.1, 0.5, 1.0],    # SVR error-tube paramter grid
+        # Parameter setting for the debug-mode
+        opt_params = {"C":                       [0.1, 1, 10],              # regularization parameter grid
+
+                      "epsilon":                 [0.025, 0.1, 0.5, 1.0],    # SVR error-tube parameter grid
+
                       "n_splits_shuffle":        3,                         # number of outer random splits
                                                                             # (< 75 test examples)
+
                       "n_splits_nshuffle":       3,                         # number of inner random splits
                                                                             # (< 75 test examples)
+
                       "n_splits_cv":             3,                         # number of outer cross-validation
                                                                             # (>= 75 test examples)
+
                       "n_splits_ncv":            3,                         # number of inner cross-validation
                                                                             # (>= 75 test examples)
+
                       "n_rep":                   2,                         # number of repetitions of the
                                                                             # model evaluation (averaged sub-
                                                                             # sequently).
-                      "excl_mol_by_struct_only": excl_mol_by_struct_only,
+
+                      "excl_mol_by_struct_only": excl_mol_by_struct_only,   # See 'evaluation_scenarios_cls.py'
+
                       "slack_type":              slack_type,
                       "all_pairs_for_test":      all_pairs_for_test}        # See 'find_hparan_ranksvm' in the
                                                                             # model_selection_cls.py.
@@ -488,9 +497,31 @@ if __name__ == "__main__":
         kernel_params = {"kernel": kernel, "gamma": [0.1, 0.25, 0.5, 1, 2, 3],
                          "scaler": feature_scaler, "poly_feature_exp": poly_feature_exp}
 
-        reranking_params = {"D": [0, 5e-3, 7.5e-3, 1e-2],
-                            "use_sign": [False], "topk": 1, "cut_off_n_cand": 300, "n_rep": 10,
-                            "epsilon_rt": 0, "min_rt_delta_range": [0], "use_log": use_log_reranking}
+        reranking_params = {"D":                  [0, 5e-3, 7.5e-3, 1e-2],  # grid for order-penalty weight
+
+                            "use_sign":           [False],                  # use only the sign of the order-
+                                                                            # penalty
+
+                            "topk":               1,                        # Number of shortest path, that
+                                                                            # should be extracted. In the paper
+                                                                            # we focus in the first one only.
+
+                            "cut_off_n_cand":     300,                      # Only consider candidates per spectra
+                                                                            # with the 300 highest MSMS-scores.
+
+                            "n_rep":              10,                       # Number of bootstrapping repetitions.
+
+                            "epsilon_rt":         0,                        # Do ignore the order constraint, if
+                                                                            # the retention time difference
+                                                                            # between to consecutive layers is
+                                                                            # <= 'epsilon_rt'. As discussed in the
+                                                                            # paperl, we do not penalize the
+                                                                            # predicted order, if the layers have
+                                                                            # retention time difference zero.
+
+                            "use_log":            use_log_reranking}        # boolean, use logarithm of the order
+                                                                            # penalty.
+
     else:
         # Hyper-parameter grids, number of cross-validation / random split folds, number of repetitions
         # (e.g. evaluations) used in the paper.
@@ -506,7 +537,7 @@ if __name__ == "__main__":
 
         reranking_params = {"D": [0, 5e-4, 1e-3, 2.5e-3, 5e-3, 7.5e-3, 1e-2, 2.5e-2, 5e-2, 7.5e-2, 1e-1],
                             "use_sign": [False], "topk": 1, "cut_off_n_cand": 300, "n_rep": 1000,
-                            "epsilon_rt": 0, "min_rt_delta_range": [0], "use_log": use_log_reranking}
+                            "epsilon_rt": 0, "use_log": use_log_reranking}
 
     # In the following let us assume we are given a dataset with 3 different systems: s_1, s_2 and s_3
     if scenario == "baseline":
@@ -743,7 +774,7 @@ if __name__ == "__main__":
             cand_data = build_candidate_structure (
                 model = {"ranking_model": ranking_model, "predictor": predictor},
                 input_dir_candidates = input_dir_candidates,
-                n_jobs = n_jobs, verbose = debug * 5)
+                n_jobs = n_jobs, verbose = debug)
 
             joblib.dump (cand_data, cand_data_fn)
 
@@ -806,8 +837,8 @@ if __name__ == "__main__":
             max_top1 = -np.inf
             max_top1_idx = -1
             for idx, D in enumerate (reranking_params["D"]):
-                d_top1_acc[D].append (l_res[idx][0][0])
-                d_top1[D].append (l_res[idx][0][0] / 100 * len (train_set))
+                d_top1_acc[D].append (l_res[idx][0][0]) # identification accuracy
+                d_top1[D].append (l_res[idx][0][0] / 100 * len (train_set)) # number of correct identifications
 
                 if l_res[idx][0][0] > max_top1:
                     max_top1 = l_res[idx][0][0]

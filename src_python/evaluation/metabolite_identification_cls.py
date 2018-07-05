@@ -192,42 +192,66 @@ def train_model_using_all_data (
     return ranking_model, best_params
 
 def build_candidate_structure (
-        model, input_dir_candidates, n_jobs = 1, verbose = False, debug = False):
+        model, input_dir_candidates, n_jobs = 1, verbose = False):
     """
+    Building up the structure collection the information about the molecular candidates.
+    The candidate information are represented as list if dictionaries, with one dictionary
+    per layer. Compare Figure 3 and Section 2.3.2 in the paper.
 
-    :param model: dictionary
+    :param model: dictionary, containing the order prediction model
 
-        :ranking_model: for example KerneRankSVM object
-
-        :kernel_params: dictionary, containing the parameter used to calcualte
-            the kernel on the fingerprints
-
-        :training_data: dictionary, data used to train the model
-
-            :X: array-like, shape = (n_train, n_features), molecule features
-            :X_C: None
+        "ranking_model": Currently only _fitted_ (see .fit(...)) KernelRankSVC objects are supported
+        "predictor": list of strings, containing the predictors used to train the model.
+                     Currently only 'maccs' and 'maccsCount_f2dcf0b3' are supported.
 
     :param input_dir_candidates: string, directory containing the scoring and
-        fingerprints of the candidates.
+        fingerprints of the candidates with following structure:
+        E.g.: input_dir_candidates = "./"
+            ./candidates/
+            |
+            --> scorings/
+            |   |
+            |   --> maccs_binary/: scoring files, with candidates for which binary maccs fps
+            |   |                  could be calculated
+            |   |
+            |   --> maccs_count/: scoring files, with candidates for which counting maccs fps
+            |   |                 could be calculated
+            |   |
+            |   --> before_cleaning_up/: scoring files, with all candidates corresponding to the
+            |                            MSMS-spectra
+            |
+            --> fingerprints/
+            |   |
+            |   --> maccs_binary/: maccs binary fingerprints of the candidates for each
+            |   |                  MSMS-spectrum separetly
+            |   |
+            |   --> maccs_count/: maccs count fingerprints of the candidates for each MSMS-sepctrum
+            |                     separetly
+            |
+            --> rts_msms.csv: File containing the molecular structure and corresponding retention time
+                              for each MSMS-spectrum in the dataset:
+                              E.g.:
+                                "inchikey","inchi","rt"
+                                "AAOVKJBEBIDNHE-UHFFFAOYSA-N","InChI=1S/C16H13ClN2O/c1-19...",9.3
+                                "ACWBQPMHZXGDFX-QFIPXVFZSA-N","InChI=1S/C24H29N5O3/c1-4-5-10...",8.9
 
-    :param n_jobs: scaler, number of jobs used to build up the graph in parallel
+    :param n_jobs: scaler, number of jobs used. The candidate structure is build layer by layer,
+        i.e., the parallelization can be performed by processing each layer separetly.
+        (default = 1)
 
-    :param debug: boolean, of True the edge weight do not contain any
-        prediction scores of the ranking model. This option can be used for debugging.
-        (default = False)
+    :param verbose: boolean, should the Parallel function be verbose? (default = False)
 
-    :return: networkx.DiGraph, directed graph containing the candidate lists
+    :return: list of dictionaries, for their structure check '_candidate_iokrscores_and_rankingscores'.
     """
-    # Load candidate fingerprints and retention times related to the candidate lists
+    # Read the retention times for each MSMS-spectrum and sort them in increasing order
     msms_rts = DataFrame.from_csv (input_dir_candidates + "/rts_msms.csv", index_col = None).sort_values ("rt")
 
-    # Load the map from inchikey <-> inchi in order to find the correct candidates
+    # Load the map from inchikey --> inchi in order to find the correct candidates
     # in the scoring list.
     d_inchikey2inchi = {inchikey: inchi for inchikey, inchi in msms_rts[["inchikey", "inchi"]].values}
 
-    # Add all the nodes to the candidate list graph.
-    # The candidate list graph is model as a directed graph.
-    l_data = Parallel (n_jobs = n_jobs, verbose = 12)(
+    # Create list of candidate dictionaries
+    l_data = Parallel (n_jobs = n_jobs, verbose = verbose)(
         delayed (_candidate_iokrscores_and_rankingscores)(
             spec = spec_id, layer = spec_idx, input_dir_candidates = input_dir_candidates,
             model = model, msms_rts = msms_rts, d_inchikey2inchi = d_inchikey2inchi)
@@ -239,13 +263,24 @@ def shortest_path (cand_data, weight_fun, cut_off_n_cand = np.inf, check_input =
     """
     Shortest path algorithm to find best metabolite assignment. See Algorithm 1 in the paper.
 
-    :param cand_data:
-    :param weight_fun:
-    :param cut_off_n_cand:
-    :param check_input:
-    :param exclude_blocked_candidates:
-    :param kwds:
-    :return:
+    :param cand_data: list of dictionaries, containing the information about the
+        candidate in each layer (see 'build_candidate_structure')
+
+    :param weight_function: function, weight function to calculate the edge weights
+        in the candidate graph (compare Figure 3).
+
+    :param cut_off_n_cand: intenger, maximum number of candidates considered in each
+        layer. E.g. if set to 300 than only the 300 molecular candidates with the
+        highest msms-based scores are used to find the shortest path.
+
+    :param check_input: boolean, perform some consistency checks on the input candidate structure.
+
+    :param kwds: dictionary, parameters passed to the weight function
+
+    :return: (nodes_shortest_path, len_shortest_path)-tuple
+
+        nodes_shortest_path: list of integers, node ids along the shortest path
+        len_shortest_path: scalar, length of the shortest path
     """
     kwds_c = copy.deepcopy (kwds)
 
@@ -320,14 +355,33 @@ def shortest_path_exclude_candidates (
         cand_data, weight_fun, cut_off_n_cand = np.inf, check_input = False,
         exclude_blocked_candidates = False, **kwds):
     """
+    Shortest path algorithm to find best metabolite assignment. See Algorithm 1 in the paper.
 
-    :param cand_data:
-    :param weight_fun:
-    :param cut_off_n_cand:
-    :param check_input:
-    :param exclude_blocked_candidates:
-    :param kwds:
-    :return:
+    Small modification: Molecular candidates can be blocked and than excluded from a shortest path.
+                        This allows the extraction of several shortest paths. In the paper we only
+                        look at the first shortests path and therefore the results are equivalent
+                        with the 'shortest_path' function.
+
+    :param cand_data: list of dictionaries, containing the information about the
+        candidate in each layer (see 'build_candidate_structure')
+
+    :param weight_function: function, weight function to calculate the edge weights
+        in the candidate graph (compare Figure 3).
+
+    :param cut_off_n_cand: intenger, maximum number of candidates considered in each
+        layer. E.g. if set to 300 than only the 300 molecular candidates with the
+        highest msms-based scores are used to find the shortest path.
+
+    :param check_input: boolean, perform some consistency checks on the input candidate structure.
+
+    :param exclude_blocked_candidates: boolean, should blocked candidates be excluded?
+
+    :param kwds: dictionary, parameters passed to the weight function
+
+    :return: (nodes_shortest_path, len_shortest_path)-tuple
+
+        nodes_shortest_path: list of integers, node ids along the shortest path
+        len_shortest_path: scalar, length of the shortest path
     """
     kwds_c = copy.deepcopy (kwds)
 
@@ -477,19 +531,22 @@ def _weight_func_max (cand_data, u, v, **kwargs):
 
 def _load_candidate_fingerprints (spec, input_dir_candidates, predictor):
     """
+    Load the candidate fingerprints of the specified msms-spectra.
 
     :param spec: string, identifier of the spectra and candidate list. Currently
-        we use the inchikey of the structure represented by the spectra. The idea
-        behind this is, that we can have the same spectra representing different
-        compounds, e.g. if we are looking at different stereo-isomers.
+        we use the inchikey of the structure represented by the spectra.
 
-    :param l_fps_files:
+    :param input_dir_candidates: string, directory containing the scoring and
+        fingerprints of the candidates (compare also 'build_candidate_structure').
 
-    :param input_dir_candidates:
+    :param predictor: list of strings, containing the predictors used to train the model.
+        Currently only 'maccs' and 'maccsCount_f2dcf0b3' are supported.
 
-    :return: (list, np.array)-tuple:
-        :1st: list of string, shape = (n_cand,), InChIs of all candidates
-        :2nd: array-like, shape = (n_cand, n_feature), fingerprint matrix of the canidates
+    :return: pandas.DataFrame, {"inchi": [...], "V1": [...], "V2": [...], ...}
+        E.g.:
+            "inchi","V1","V2",...
+            "InChI=1S/C10H10N4O2S/c1-5-6(2)17-10(11-5)...",0,0,...
+            ...
     """
     if predictor[0] == "maccs":
         fps_fn = "maccs_binary"
@@ -502,21 +559,32 @@ def _load_candidate_fingerprints (spec, input_dir_candidates, predictor):
     cand_fps_fn = list (filter (re.compile ("fps_" + fps_fn + "_list.*=%s.csv" % spec).match, l_fps_files))
     assert (len (cand_fps_fn) == 1)
     cand_fps_fn = input_dir_candidates + "/fingerprints/" + fps_fn + "/" + cand_fps_fn[0]
-    cand_fps = DataFrame.from_csv (cand_fps_fn, index_col = None)
 
-    return cand_fps
+    # Return the candidate fingerprints
+    return DataFrame.from_csv (cand_fps_fn, index_col = None)
 
 def _load_candidate_scorings (spec, input_dir_candidates, predictor):
     """
+    Load the msms-based scores for the candidates of the specified msms-spectra.
 
     :param spec: string, identifier of the spectra and candidate list. Currently
-        we use the inchikey of the structure represented by the spectra. The idea
-        behind this is, that we can have the same spectra representing different
-        compounds, e.g. if we are looking at different stereo-isomers.
+        we use the inchikey of the structure represented by the spectra.
 
-    :param input_dir_candidates:
+    :param input_dir_candidates: string, directory containing the scoring and
+        fingerprints of the candidates (compare also 'build_candidate_structure').
 
-    :return: pandas.DataFrame
+    :param predictor: list of strings, containing the predictors used to train the model.
+        Currently only 'maccs' and 'maccsCount_f2dcf0b3' are supported.
+
+    :return: pandas.DataFrame, {"id1": [...], "score": [...]}
+        E.g.:
+            id1,score
+            "InChI=1S/C10H10N4O2S/c11-8-1-3-9(4-2-8)17...",0.601026809509167
+            "InChI=1S/C10H10N4O2S/c11-8-2-4-9(5-3-8)17...",0.59559886408
+            ...
+
+        NOTE: 'id1' here to the InChI, this can be changed, but we also need to modify
+              '_process_single_candidate_list'.
     """
     if predictor[0] == "maccs":
         fps_fn = "maccs_binary"
@@ -530,19 +598,38 @@ def _load_candidate_scorings (spec, input_dir_candidates, predictor):
     assert (len (scores_fn) == 1)
     scores_fn = input_dir_candidates + "/scorings/" + fps_fn + "/" + scores_fn[0]
 
+    # Return scores in descending order
     return DataFrame.from_csv (scores_fn, index_col = None).sort_values ("score", ascending = False)
 
 
 def perform_reranking_of_candidates (cand_data, topk = 25, cut_off_n_cand = np.inf,
                                      weight_function = None, **kwargs):
     """
+    Function to re-rank sets of molecular candidates under exploitation of the
+    msms-based scores and predicted retention orders.
 
+    A special case: If topk = 1, than only the first shortest path is extracted.
+                    This case is evaluated in the paper (Section 2.3).
 
-    :param cand_data:
-    :param cut_off_n_cand:
-    :param topk:
-    :param kwargs:
-    :return:
+    :param cand_data: list of dictionaries, containing the information about the
+        candidate in each layer (see 'build_candidate_structure')
+
+    :param cut_off_n_cand: intenger, maximum number of candidates considered in each
+        layer. E.g. if set to 300 than only the 300 molecular candidates with the
+        highest msms-based scores are used to find the shortest path.
+
+    :param topk: integer, how many shortest path should be returned.
+
+    :param weight_function: function, weight function to calculate the edge weights
+        in the candidate graph (compare Figure 3).
+
+    :param kwargs: dictionary, arguments passed to the weight function.
+
+    :return: (topk_accs, paths, lengths)-tuple
+
+        * topk accuracies, e.g. top1 accuracy = metabolite identification accuracy
+        * path: topk shortest paths, list of list of integers (node ids)
+        * lengts: list of lists of integers, length of the topk shortest paths
     """
     def _t_map (t, all_cand_blocked):
         return np.arange(0, len (all_cand_blocked))[~all_cand_blocked][t]
@@ -594,25 +681,36 @@ def perform_reranking_of_candidates (cand_data, topk = 25, cut_off_n_cand = np.i
 def _candidate_iokrscores_and_rankingscores (
         spec, input_dir_candidates, model, msms_rts, d_inchikey2inchi, layer):
     """
+    Construct the dictionary containing the msms-based and retention order scores
+    for each molecular candidated in the current layer.
 
-    :param spec:
-    :param l_fps_files:
-    :param l_scoring_files:
-    :param input_dir_candidates:
-    :param model:
-    :param msms_rts:
-    :param d_inchikey2inchi:
-    :parm add_source_and_target_node: boolean,
-    :return:
+    :param spec: string, unique identifier for the spectrum in the layer to process.
+        Currently we use the inchikey of the corresponding molecular structure for that.
+
+    :param input_dir_candidates: string, directory containing the scoring and
+        fingerprints of the candidates (compare also 'build_candidate_structure').
+
+    :param model: dictionary, containing the order prediction model
+
+        "ranking_model": Currently only _fitted_ (see .fit(...)) KernelRankSVC objects are supported
+        "predictor": list of strings, containing the predictors used to train the model.
+                     Currently only 'maccs' and 'maccsCount_f2dcf0b3' are supported.
+
+    :param msms_rts: pandas.DataFrame, containing the content of the 'msms_rts.csv'
+        file. (compare also 'build_candidate_structure')
+
+    :param d_inchikey2inchi: dictionary, keys: inchikeys, values: corresponding inchis,
+        for all the MSMS spectra
+
+    :param layer: integer, layer index
+
+    :return: dictonary, containing the information about the candidates of the current layer.
     """
     def _process_single_candidate_list (
             spec, scores, cand_fps, msms_rts, d_inchikey2inchi, layer, model):
         """
-
         :param spec: string, identifier of the spectra and candidate list. Currently
-            we use the inchikey of the structure represented by the spectra. The idea
-            behind this is, that we can have the same spectra representing different
-            compounds, e.g. if we are looking at different stereo-isomers.
+            we use the inchikey of the structure represented by the spectra.
 
         :param scores: pandas.DataFrame, shape = (n_cand, 2), two-column data-frame:
 
@@ -623,7 +721,8 @@ def _candidate_iokrscores_and_rankingscores (
 
              The table must be sorted according to the score of the candidates descending.
 
-        :param msms_rts:
+        :param msms_rts: pandas.DataFrame, shape = (n_spec, 3), containing the information
+            about the inchikey, inchi and retention time of each msms-spectra.
 
         :param d_inchikey2inchi: dictionary, mapping from the inchikey (spectra and
             candidate list identifier) to the inchi of the correct / true candidate.
@@ -631,17 +730,20 @@ def _candidate_iokrscores_and_rankingscores (
             :key: string, inchikey
             :value: string, inchi
 
-        :param layer:
+        :param layer: integer, layer index
+
+        :param model: dictionary, containing the order prediction model
+
+            "ranking_model": Currently only _fitted_ (see .fit(...)) KernelRankSVC objects are supported
+            "predictor": list of strings, containing the predictors used to train the model.
+                         Currently only 'maccs' and 'maccsCount_f2dcf0b3' are supported.
 
         :param add_ranking_score: boolean, should the ranking / preference score be
             added to each node, e.g. RankSVM: w^T\phi_i
 
-        :return: scalar, rank of the correct / true candidates (remember we are using
-            dense ranks here.)
-
-        :TODO: We could also predict for each candidate a retention time here!
+        :return: dictonary, containing the information about the candidates
+            of the current layer.
         """
-        #
         rt_cand_list = msms_rts[msms_rts.inchikey == spec].rt.values
         assert (len (rt_cand_list) == 1)
         rt_cand_list = rt_cand_list[0]
@@ -697,12 +799,35 @@ def _candidate_iokrscores_and_rankingscores (
 
         assert (rank_correct_cand > 0)
 
-        return {"iokrscores": iokrscores, "ranks": ranks, "is_true_identification": is_true_identification,
-                "d_squared": d_squared, "wtx": wtx, "inchis": id1s, "rt_cand_list": rt_cand_list,
-                "rank_correct_cand": rank_correct_cand, "inchi_correct_cand": inchi_correct_cand,
-                "spec_id": spec}
+        return {"iokrscores": iokrscores,                           # msms-based scores of the candidates
 
-    # Load candidate scores and fps
+                "ranks": ranks,                                     # dense rank for each candidate based on
+                                                                    # the msms scores
+
+                "is_true_identification": is_true_identification,   # boolean vector indicating the whether
+                                                                    # a candidate is the true identification,
+                                                                    # i.e. the correct candidate
+
+                "d_squared": d_squared,                             # euclidean distance of the each candidates'
+                                                                    # feature vector (fp) to the one of the
+                                                                    # correct candidate (used the models kernel)
+
+                "wtx": wtx,                                         # retention order score predicted using the
+                                                                    # KernelRankSVC implementation
+
+                "inchis": id1s,                                     # candidate inchies
+
+                "rt_cand_list": rt_cand_list,                       # retention time associated with the
+                                                                    # candidate list
+
+                "rank_correct_cand": rank_correct_cand,             # rank of the correct candidates, based
+                                                                    # on the msms-score.
+
+                "inchi_correct_cand": inchi_correct_cand,           # inchi of the correct candidate
+
+                "spec_id": spec}                                    # spectra identifier
+
+    # Load candidate scores and fps correponding to the model predictor
     scores = _load_candidate_scorings (spec, input_dir_candidates, model["predictor"])
     cand_fps = _load_candidate_fingerprints (spec, input_dir_candidates, model["predictor"])
 
