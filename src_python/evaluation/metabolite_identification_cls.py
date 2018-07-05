@@ -760,7 +760,7 @@ def _candidate_iokrscores_and_rankingscores (
             metric = model["ranking_model"].kernel, filter_params = True)
 
         # Output lists
-        # Note: The candidate are (if) sorted according to their IOKR score
+        # Note: The candidate are sorted according to their IOKR score (descending)
         #       see '_load_candidate_scorings'.
         iokrscores = []
         ranks = []

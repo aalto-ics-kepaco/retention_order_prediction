@@ -379,7 +379,7 @@ def evaluate_on_target_systems (
                 print (grid_search_best_params_tmp)
 
                 ## Do prediction for the test set
-                # Calculate: w' * x_i, for all molecules i
+                # Calculate: w' * \phi(x_i), for all molecules i
                 X_test, rts_test = [], []
 
                 for key in l_keys_target_test:

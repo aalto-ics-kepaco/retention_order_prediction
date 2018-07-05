@@ -30,7 +30,7 @@ def make_candidate_data():
              "predictor": ["maccs"]}
 
     cand_data = build_candidate_structure(
-        input_dir_candidates=input_dir_candidates, model=model, n_jobs=2, debug=True)
+        input_dir_candidates=input_dir_candidates, model=model, n_jobs=2)
     return cand_data
 
 class Test_reranking_of_candidates(unittest.TestCase):
