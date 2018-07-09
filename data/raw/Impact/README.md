@@ -3,19 +3,24 @@
 For the metabolite identification experiments we downloaded the retention times 
 provided by the Department of Chemistry of the University of Athens from Massbank.
 
-## Pre-processing
+## Data filtering
 
-We only consider entries where the
+We only consider entries where:
 
 - AC$MASS_SPECTROMETRY: MS_TYPE == MS2
 - AC$MASS_SPECTROMETRY: ION_MODE == POSITIVE
-- retentiom time >= 1min
-- relative retention time difference 
+- retentiom time >= 1min.
 
+When multiple retention times for single compound where available, than we only
+added the lowest retention time to our dataset. We removed molecular structures
+for which the relative retention time difference of multiple measurements was 
+greater than 5%. 
 
+We furthermore removed 8 compounds due to difficulties calculating the molecular
+fingerprints from their structure. 
 
-For the metabolite identification experiments we downloaded the retention times 
-of 342 molecules. 
+The described data filtering left us with 342 (molecular structure, retention-times)
+-tuples. 
 
 ## References
 
