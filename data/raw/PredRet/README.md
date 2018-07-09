@@ -11,7 +11,7 @@ Any changes made to the database after that date are _not reflected_ in this rep
 
 ## Data filtering
 
-We perform the following pre-processing steps (see [pre-processing script](data/scripts/R/preprocessing/preprocessing_PredRet_v2.Rmd))
+We perform the following pre-processing steps (see [pre-processing script](data/scripts/preprocessing_PredRet_v2.Rmd))
 to the data:
 
 - Consider only reversed phase columns
