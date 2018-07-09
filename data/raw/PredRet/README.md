@@ -11,7 +11,7 @@ Any changes made to the database after that date are not included in this reposi
 
 ## Data filtering
 
-We perform the following pre-processing steps (see [pre-processing script](preprocessing_PredRet_v2.Rmd))
+We perform the following pre-processing steps (see [pre-processing script](data/scripts/R/preprocessing/preprocessing_PredRet_v2.Rmd))
 to the data:
 
 - Consider only reversed phase columns
@@ -19,7 +19,6 @@ to the data:
 - Early eluting molecules are excluded
 - Minimum retention time is used when multiple RTs for a single molecular structures
 - When relative difference of multiple RTs is larger than 5%, the structure will be removed.
-
 
 ## References
 
