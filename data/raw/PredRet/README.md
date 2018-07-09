@@ -15,7 +15,7 @@ We perform the following pre-processing steps (see [pre-processing script](prepr
 to the data:
 
 - Consider only reversed phase columns
-- Consider only datasets included in the publication [@predret_paper]
+- Consider only datasets included in the publication by [Stanstrup et al. (2015)][@predret_paper]
 - Early eluting molecules are excluded
 - Minimum retention time is used when multiple RTs for a single molecular structures
 - When relative difference of multiple RTs is larger than 5%, the structure will be removed.
