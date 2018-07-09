@@ -7,7 +7,7 @@ the database in August 2016 using the open-source tool [PredRet](https://github.
 ```R
 PredRet_get_db (exp_pred = "exp")
 ```
-Any changes made to the database after that date are not included in this repository. 
+Any changes made to the database after that date are _not reflected_ in this repository. 
 
 ## Data filtering
 
