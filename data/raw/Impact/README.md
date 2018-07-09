@@ -1,8 +1,8 @@
 # Massbank entries used for the metabolite identification experiments
 
 For the metabolite identification experiments we extracted the retention times 
-provided by the [Department of Chemistry of the University of Athens][1]
-from [Massbank][1]. The dataset encompasses entries made before 31st of May 2016. Any 
+provided by the [Department of Chemistry of the University of Athens][@AU_in_massbank]
+from [Massbank][@massbank]. The dataset encompasses entries made before 31st of May 2016. Any 
 changes that happend after this date are _not reflected_ in this repository.
 
 ## Data filtering
@@ -25,13 +25,15 @@ The described data filtering left us with __342 (molecular structure, retention-
 
 ## Accession IDs
 
-See [massbank_entry_list.txt](massbank_entry_list.txt)
+The file [massbank_entry_list.txt](massbank_entry_list.txt) contains all the accession
+ids of the massbank entries we used. Lines that contain several ids indicate, that
+their corresponding retention times have been merged, as the ids corresponded to 
+the same molecular structure.
 
 ## References
 
-[1]:https://massbank.eu/MassBank/jsp/Result.jsp?type=rcdidx&idxtype=site&srchkey=32&sortKey=name&sortAction=1&pageNo=1&exec=
+TODO: Print references here.
 
-[Massbank][1] MassBank: a public repository for sharing mass spectral data for life sciences,
-    Horai, H.; Arita, M.; Kanaya, S.; Nihei, Y.; Ikeda, T.; Suwa, K.; Ojima, Y.; Tanaka, K.; Tanaka, S.; Aoshima, K. & others
-    
-    https://massbank.eu/MassBank/jsp/Result.jsp?type=rcdidx&idxtype=site&srchkey=32&sortKey=name&sortAction=1&pageNo=1&exec=
+[@AU_in_massbank]: https://massbank.eu/MassBank/jsp/Result.jsp?type=rcdidx&idxtype=site&srchkey=32&sortKey=name&sortAction=1&pageNo=1&exec=
+[@massbank]: https://onlinelibrary.wiley.com/doi/abs/10.1002/jms.1777 "Massbank: a public repository for sharing mass spectral data for life sciences, Horai, H.; Arita, M.; Kanaya, S.; Nihei, Y.; Ikeda, T.; Suwa, K.; Ojima, Y.; Tanaka, K.; Tanaka, S.; Aoshima, K. & others, Journal of mass spectrometry, 2010"
+
