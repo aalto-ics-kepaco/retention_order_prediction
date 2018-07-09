@@ -1,4 +1,17 @@
-library (data.table)
+#
+# Script to combine the PredRet and Impact (from Massbank) RTs / FPs. 
+#
+# MACCS counting FPs for the Impact data (only the structures without MSMS) are
+# calculated as well.
+#
+# The combined set is needed for the experiments regarding the metabolite 
+# identification presented in Section 3.2. There, we refer to the combined 
+# dataset as "Others & target", with "others" encompassing the data from PredRet
+# and target encompassing the data from Impact for which _no_ MSMS spectra is
+# available. 
+#
+
+require (data.table)
 
 #' Calculate the inchikey for a list of inchis
 #' 
@@ -24,11 +37,14 @@ inchi2inchikey <- function (inchi, only_2D = FALSE, verbose = FALSE) {
     return (output)
 }
 
+base_dir <- stop ("DEFINE BASE-PATH CONTAINING INPUT DATA!") 
+# Eg: base_dir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/data"
+
 # Load the fingerprint tools
-source ("/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/data/scripts/R/tools/fingerprint_tools.R")
+source (paste (base_dir, "scripts/fingerprint_tools.R", sep = "/"))
 
 # Set the source directory for the data
-sdir <- "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/data/processed/s10_imp_no3D/"
+sdir <- paste (base_dir, "processed/s10_imp_no3D/", sep = "/")
 
 #### Retention times ####
 
@@ -47,9 +63,7 @@ rts_impact$system <- "Impact"
 # Remove the molecular structures from the Impact dataset that have MS/MS spectra.
 rts_impact_with_msms <- data.table (read.csv (paste0 (sdir, "rts_impact_with_msms.csv")))
 rts_impact_with_msms$inchikey_1 <- inchi2inchikey (rts_impact_with_msms$inchi, only_2D = TRUE)
-# Remove charge and stereo information from the compounds
-# rts_impact_with_msms$inchi <- inchi.rem.stereo (inchi.rem.charges (rts_impact_with_msms$inchi))
-rts_impact <- rts_impact[! (inchikey %in% rts_impact_with_msms$inchikey)]
+rts_impact <- rts_impact[! (inchikey_1 %in% rts_impact_with_msms$inchikey_1)]
 
 # Put PretRed and Impact retention times together.
 rts <- rbind (rts_predret_set10, rts_impact)
@@ -57,28 +71,7 @@ write.csv (rts, file = paste0 (sdir, "rts.csv"), row.names = FALSE)
 
 #### Fingerprints ####
 
-calculate_binary <- FALSE
 calculate_count <- FALSE
-
-if (calculate_binary) {
-    # Load the Predret (binary, maccs) fingerprints
-    fps_bin_predret <- data.table (read.csv (paste0 (sdir, "fps_maccs_binary_predret.csv")))
-    fps_bin_predret <- fps_bin_predret[inchi %in% rts_predret_set10$inchi]
-    
-    # Load the Impact (binary, maccs) fingerprints
-    fps_bin_impact <- calculate_fingerprints_from_inchi (
-        unique (rts_impact$inchi), fps_definitions = "maccs", fps_type = "bit")
-    fps_bin_impact <- data.table (
-        cat_fingerprint_list_to_matrix (fps_bin_impact), keep.rownames = TRUE)
-    setnames (fps_bin_impact, "rn", "inchi")
-    
-    # Put PretRed and Impact (binary, maccs) fingerprints together.
-    fps_bin <- unique (rbind (fps_bin_predret, fps_bin_impact), key = "inchi")
-    setkey (fps_bin, "inchi")
-    stopifnot (all (rts$inchi %in% fps_bin$inchi))
-    
-    write.csv (fps_bin, file = paste0 (sdir, "fps_maccs_binary.csv"), row.names = FALSE)
-}
 
 if (calculate_count) {
     # Load the Predret (counting, maccs) fingerprints
@@ -99,5 +92,3 @@ if (calculate_count) {
     
     write.csv (fps_count, file = paste0 (sdir, "fps_maccs_count.csv"), row.names = FALSE)
 }
-
-# stopifnot (all (fps_count$inchi == fps_bin$inchi))
