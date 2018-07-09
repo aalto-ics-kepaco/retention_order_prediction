@@ -1,2 +1,4 @@
-# Shortenings for the different datasets
-**PredRet_v2_set10_and_Impact** --> **s10_imp**
+Pre-processed input data, that is used by the RankSVM and by the dynamic programming
+algorithm:
+- Retention times, MSMS-spectra and molecular candidates for the __Impact__ dataset.
+- 
