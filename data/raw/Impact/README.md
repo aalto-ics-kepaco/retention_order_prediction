@@ -1,7 +1,9 @@
 # Massbank entries used for the metabolite identification experiments
 
-For the metabolite identification experiments we downloaded the retention times 
-provided by the Department of Chemistry of the University of Athens from Massbank.
+For the metabolite identification experiments we extracted the retention times 
+provided by the [Department of Chemistry of the University of Athens][1]
+from [Massbank][1]. The dataset encompasses entries made before 31st of May 2016. Any 
+changes that happend after this date are _not reflected_ in this repository.
 
 ## Data filtering
 
@@ -19,10 +21,17 @@ greater than 5%.
 We furthermore removed 8 compounds due to difficulties calculating the molecular
 fingerprints from their structure. 
 
-The described data filtering left us with 342 (molecular structure, retention-times)
--tuples. 
+The described data filtering left us with __342 (molecular structure, retention-times)-tuples__. 
+
+## Accession IDs
+
+See [massbank_entry_list.txt](massbank_entry_list.txt)
 
 ## References
 
-[1] MassBank: a public repository for sharing mass spectral data for life sciences,
+[1]:https://massbank.eu/MassBank/jsp/Result.jsp?type=rcdidx&idxtype=site&srchkey=32&sortKey=name&sortAction=1&pageNo=1&exec=
+
+[Massbank][1] MassBank: a public repository for sharing mass spectral data for life sciences,
     Horai, H.; Arita, M.; Kanaya, S.; Nihei, Y.; Ikeda, T.; Suwa, K.; Ojima, Y.; Tanaka, K.; Tanaka, S.; Aoshima, K. & others
+    
+    https://massbank.eu/MassBank/jsp/Result.jsp?type=rcdidx&idxtype=site&srchkey=32&sortKey=name&sortAction=1&pageNo=1&exec=
