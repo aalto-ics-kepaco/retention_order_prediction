@@ -600,43 +600,83 @@ class KernelRankSVC (BaseEstimator, ClassifierMixin):
     """
     Implementation of the kernelized Ranking Support Vector Classifier.
 
-    :param C: scalar, regularization parameter of the SVM
+    The optimization is performed in the dual-space using the condidation gradient (a.k.a. Frank-Wolfe
+    algorithm[1,2]). See also the paper for details on the optimization problem.
 
-    :param kernel: string, determing the kernel used for the data
-        "precomputed": The kernel matrix is precomputed and provided to the fit and prediction function.
-        otherwise: The desired kernel is calculated from the molecular representation
-            Supported kernels are: ["rbf", "polynomial", "linear", "tanimoto", "minmax"]
+    [1] An algorithm for quadratic programming, Frank M. and Wolfe P, Navel Research Logistic Quarterly banner,
+        1956
+    [2] Revisiting Frank-Wolfe: Projection-Free Sparse Convex Optimization, Jaggi M., Proceedings of the 30th
+        International Conference on Machine Learning, 2013
 
-    :param feature_type: string, determing the used pairwise feature
-        "difference": Feature difference is used: phi_j - phi_i
-        "exterior_product": The exterior product is used: phi_j \otimes \phi_i - phi_i \otimes \phi_i
+    :param C: scalar, regularization parameter of the SVM (default = 1.0)
 
-    :param opt_param: dictionary containing all parameters used for the optimization using
-        conditional gradient descent:
-            1) 'tol': scalar, tolerance of the change of the alpha vector.
-               If |max (alpha_old - alpha_new)| < tol ==> convergence.
-            2) 'max_iter': scalar, maximum number of iterations
-            3) 'step_size_algorithm': string, determining the algorithm used to find the step size in each iteration:
-                    Supported algorithms are: ["linesearch", "diminishing", "fixed"]
-            If 'diminishing':
-            4) 'step_size_initial': scalar, intial step size t_0
+    :param kernel: string or callable, determing the kernel used for the data. Logic of this function
+        (default = "precomputed")
+        - "precomputed": The kernel matrix is precomputed and provided to the fit and prediction function.
+        - ["rbf", "polynomial", "linear"]: The kernel is computed by the scikit-learn build it functions
+        - callable: The kernel is computed using the provided callable function, e.g., to get the tanimoto
+            kernel.
 
-    :param random_state:
+    :param feature_type: string, determing the used pairwise feature (default = "difference")
+        - "difference": Feature difference is used: phi_j - phi_i
 
-    :param verbose:
+    :param tol: scalar, tolerance of the change of the alpha vector. (default = 0.001)
+        E.g. if "convergence_criteria" == "alpha_change_max" than
+         |max (alpha_old - alpha_new)| < tol ==> convergence.
 
-    Attributes:
-    -----------
+    :param max_iter: scalar, maximum number of iterations (default = 1000)
 
-    :KX: array-like, shape = (l, l), kernel matrix containing the similarities
-        between the molecules.
+    :param t_0: scalar, initial step-size (default = 0.1)
 
-    :alpha: array-like, shape = (p, 1), current dual variables
+    :param step_size_algorithm: string, which step-size calculation method should be used.
+        (default = "diminishing")
+        - "diminishing": iterative decreasing stepsize
+        - "diminishing_2": iterative decreasing stepsize, another formula
+        - "fixed": fixed step size t_0
+        - "linesearch": step size determined by line-search
 
+        NOTE: Check corresponding functions "_get_step_size_*" for implementation.
+
+    :param gamma: scalar, scaling factor of the gaussian and polynomial kernel. If None, than it will
+        be set to 1 / #features.
+
+    :param coef0: scalar, parameter for the polynomial kernel
+
+    :param degree: scalar, degree of the polynomial kernel
+
+    :param kernel_params: dictionary, parameters that are passed to the kernel function. Can be used to
+        input own kernels.
+
+    :param slack_type: string, what the slack variables are representing (default = "on_pairs")
+        - "on_pairs": there is a slack-variable for each training pair
+
+    :param convergence_criteria: string, how the convergence of the gradient descent should be determined.
+        (default = "alpha_change_max")
+        - "alpha_change_max": maximum change of the dual variable
+        - "gs_change": change of the dual objective
+        - "alpha_change_norm": change of the norm of the dual variables
+
+    :param verbose: boolean, should the optimization be verbose (default = False)
+
+    :param debug: scalar, debug level, e.g., calculation duality gap. This increases the complexity.
+        (default = 0)
+
+    :param random_state: integer, used as seed for the random generator. The randomness would
+        effect the labels of the training pairs. Check the 'fit' and 'get_pairwise_labels' functions
+        for details.
+
+    Kernels:
+    --------
+    "linear": K(X, Y) = <X, Y>
+    "polynomial": K(X, Y) = (gamma <X, Y> + coef0)^degree
+    "rbf": K(x, y) = exp(- gamma ||x - y||^2)
+
+    SOURCE: http://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics.pairwise
     """
     def __init__ (self, C = 1.0, kernel = "precomputed", feature_type = "difference",
                   tol = 0.001, max_iter = 1000, t_0 = 0.1, step_size_algorithm = "diminishing",
-                  gamma = None, coef0 = 1, degree = 3, kernel_params = None, slack_type = "on_pairs", convergence_criteria = "alpha_change_max", verbose = False, debug = 0, random_state = None):
+                  gamma = None, coef0 = 1, degree = 3, kernel_params = None, slack_type = "on_pairs",
+                  convergence_criteria = "alpha_change_max", verbose = False, debug = 0, random_state = None):
 
         if feature_type not in ["difference"]:
             raise ValueError ("Invalid feature type: %s" % feature_type)
@@ -690,7 +730,7 @@ class KernelRankSVC (BaseEstimator, ClassifierMixin):
         The conditional gradient descent algorithm is used to find the optimal
         alpha vector.
 
-        :param mol_ids: array, identifier of the molecules used for the fitting
+        :param mol_ids: array, CURRENTLY NOT USED
 
         :param y: array-like, shape = (p, 1). Label for each pairwise relation:
             Positive and negative class:
@@ -1120,7 +1160,7 @@ class KernelRankSVC (BaseEstimator, ClassifierMixin):
         if self.feature_type == "difference":
             return (r.T.dot (alpha) - 0.5 * alpha.T.dot (self._last_AKAt_y))[0]
 
-    def _is_feasible (self, alpha, p, eps_feas = 1e-8):
+    def _is_feasible (self, alpha, p):
         """
         Check whether the provided alpha vector is in the feasible set:
 
@@ -1131,26 +1171,9 @@ class KernelRankSVC (BaseEstimator, ClassifierMixin):
         If slack-type: on_pairs:
             3) alpha_ij <= C for all (i,j) in P
 
-        If slack-type: on_examples:
-            3) [A_+^T]_(i,.) alpha <= C + epsilon for all i in {1,...,l}
-
-        If slack-type: on_examples_out:
-            3) [A_out^T]_(i,.) alpha <= C for all i in {1,...,l}
-
-        All three conditions must be satisfied.
-
-        The epsilon for slack-type "on_examples" was defined, after I observed that
-        using the MOSEK solver for the subproblem, the contraints are not fully
-        satisfied. When I read the MOSEK documentation, I found that during the optimization
-        a threshold / epsilon is defined, that checks for satisfactions of the constraints.
-        I took the value from there for the feasibility check in my optimization.
-        (See https://docs.mosek.com/8.1/toolbox/solving-linear.html#adjusting-optimality-criteria-and-near-optimality)
-
         :param alpha: array-like, shape = (p, 1), dual variables
 
         :param p: scalar, number of dual variables (pairwise relations)
-
-        :param eps_feas: scalar, epsilon used for slack-type "on_examples" (default = 1e-8)
 
         :return: Boolean:
             True,  if alpha is in the feasible set
