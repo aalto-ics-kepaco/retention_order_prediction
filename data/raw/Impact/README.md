@@ -2,8 +2,9 @@
 
 For the metabolite identification experiments we extracted the retention times 
 provided by the [Department of Chemistry of the University of Athens][@AU_in_massbank]
-from [Massbank][@massbank]. The dataset encompasses entries made before 31st of May 2016. Any 
-changes that happend after this date are _not reflected_ in this repository.
+from [Massbank][@massbank_webpage] [(Horai et al., 2010)][@massbank_paper]. 
+The dataset encompasses entries made before 31st of May 2016. Any changes that happend 
+after this date are _not reflected_ in this repository.
 
 ## Data filtering
 
@@ -35,5 +36,5 @@ the same molecular structure.
 TODO: Print references here.
 
 [@AU_in_massbank]: https://massbank.eu/MassBank/jsp/Result.jsp?type=rcdidx&idxtype=site&srchkey=32&sortKey=name&sortAction=1&pageNo=1&exec=
-[@massbank]: https://onlinelibrary.wiley.com/doi/abs/10.1002/jms.1777 "Massbank: a public repository for sharing mass spectral data for life sciences, Horai, H.; Arita, M.; Kanaya, S.; Nihei, Y.; Ikeda, T.; Suwa, K.; Ojima, Y.; Tanaka, K.; Tanaka, S.; Aoshima, K. & others, Journal of mass spectrometry, 2010"
-
+[@massbank_paper]: https://onlinelibrary.wiley.com/doi/abs/10.1002/jms.1777 "Massbank: a public repository for sharing mass spectral data for life sciences, Horai, H.; Arita, M.; Kanaya, S.; Nihei, Y.; Ikeda, T.; Suwa, K.; Ojima, Y.; Tanaka, K.; Tanaka, S.; Aoshima, K. & others, Journal of mass spectrometry, 2010"
+[@massbank_webpage]: https://massbank.eu/MassBank/ "Massbank EU webpage"
