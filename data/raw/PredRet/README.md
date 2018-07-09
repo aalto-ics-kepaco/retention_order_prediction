@@ -2,8 +2,14 @@
 
 We evaluated the retention order prediction approach using retention times extracted
 from the publicly available retention time database provided by [Stanstrup et al. (2015)][@predret_paper].
+We downloaded a snapshop of the database in August 2016 using the open-source tool
+[PredRet](https://github.com/stanstrup/PredRet):
+```R
+PredRet_get_db (exp_pred = "exp")
+```
+Any changes made to the database after that date are not included in this repository. 
 
-The file [Stanstrup_exp_Aug16.csv][Stanstrup_exp_Aug16.csv]
+The file [Stanstrup_exp_Aug16.csv](Stanstrup_exp_Aug16.csv) contains 
 
 ## Data filtering
 
