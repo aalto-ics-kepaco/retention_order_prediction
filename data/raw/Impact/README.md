@@ -1,4 +1,4 @@
-# Massbank entries used for the metabolite identification experiments
+# Massbank data used for the metabolite identification experiments
 
 For the metabolite identification experiments we extracted the retention times 
 provided by the [Department of Chemistry of the University of Athens][@AU_in_massbank]
