@@ -1,10 +1,14 @@
-library (data.table)
+#
+# Script to calculate molecular fingerprints for the PredRet dataset.
+# 
+
+require (data.table)
 
 base_dir <- stop ("DEFINE BASE-PATH CONTAINING INPUT DATA!") 
 # Eg: base_dir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/data"
 
 # Load the fingerprint tools
-source (paste (base_dir, "/scripts/R/tools/fingerprint_tools.R", sep = "/"))
+source (paste (base_dir, "/scripts/fingerprint_tools.R", sep = "/"))
 
 # Set the source directory for the data
 sdir <- paste (base_dir, "processed/PredRet/v2/", sep = "/")
