@@ -15,7 +15,7 @@ performance using __RankSVM__ (```"ranksvm_slacktype=on_pairs"```) when trained
 on a single system and applied to a single target system:
 
 ```R
-sdir_results <- "results/raw/PredRet/v2/"
+sdir_results <- "results/raw/PredRet/v2/final/" # example when dataset PredRet/v2 is used
 
 load_baseline_single_results (
     measure = c("accuracy", "accuracy_std"), 
@@ -30,6 +30,9 @@ load_baseline_single_results (
 Parameters:
 - ```measure```: Which evaluation measure to load, e.g., accuracy, correlation, ... (see also: [evaluation_scenarios_cls.py](src/evaluation_scenarios_cls.py#L464))
 - ```base_dir```: Directory of the processed input data of a certain dataset, e.g. ```PredRet/v2```
+  - For RankSVM this paramter is set to [```paste0 (sdir_results, "ranksvm_slacktype=on_pairs/")```](results/raw/PredRet/v2/final/ranksvm_slacktype=on_pairs)
+  - For SVR this parameter is set to [```paste0 (sdir_results, "svr/")```](results/raw/PredRet/v2/final/svr)
+  - If the evaluation script is run in _debug_ mode, than replace ```final``` by ```debug```.
 - ```predictor```: Which feature was used to represent the molecules, e.g., MACCS fingerprints.
 - ```kernel```: Which kernel was used on top of the molecular features, e.g., Tanimoto kernel.
 - ```pair_params```: Paramters for the training pair generation from the retention times for the RankSVM (see for example function [```get_pairs_from_order_graph```](src/rank_svm_cls.py#L60) for details)
@@ -41,3 +44,4 @@ Parameters:
 - ```flavor```: List of parameters used to identify the some settings during the evaluation:
   - ```allpairsfortest```: See parameter documentation of [```find_hparan_ranksvm```](src/model_selection_cls.py#L198).
   - ```featurescaler```: Feature scaler used for the molecular features. (see also: [```evaluate_on_target_systems```](src/evaluation_scenarios_cls.py#L209))
+  - ```sysset```: Which (sub)set of systems from the specified dataset should be used, e.g., [the used in the paper (=10)](results/raw/PredRet/v2/config_local.json#L7).
