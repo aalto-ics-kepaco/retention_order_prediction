@@ -16,4 +16,8 @@ Note: The ```rts.csv``` contains also the information which chromatographic syst
 was used to measure a certain structure. One dataset, e.g. ```PredRet```, encompasses
 possible several (chromatographic) systems.
 
-There are scripts for each dataset to be created from the [raw](../raw) files.
+There are [scripts](../scripts) for each dataset to be created from the [raw](../raw) files:
+
+- ```PredRet```:
+  - Pre-processing: [preprocessing_PredRet_v2.Rmd](../scripts/preprocessing_PredRet_v2.Rmd)
+  - Fingerprint calculation: [calculate_fingerprints_for_impact_candidates.R](../scripts/calculate_fingerprints_for_impact_candidates.R)
