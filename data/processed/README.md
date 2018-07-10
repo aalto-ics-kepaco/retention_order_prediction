@@ -20,4 +20,13 @@ There are [scripts](../scripts) for each dataset to be created from the [raw](..
 
 - ```PredRet```:
   - Pre-processing: [preprocessing_PredRet_v2.Rmd](../scripts/preprocessing_PredRet_v2.Rmd)
-  - Fingerprint calculation: [calculate_fingerprints_for_impact_candidates.R](../scripts/calculate_fingerprints_for_impact_candidates.R)
+  - Fingerprint calculation: [calculate_fingerprints_for_PredRet_v2_molecules.R](../scripts/calculate_fingerprints_for_PredRet_v2_molecules.R)
+- ```s10_imp_no3D```: Combination of the PredRet and Impact (without MSMS) data
+  - Data-set combination and fingerprint calculation: [combine_predret_v2_sset10_and_impact.R](../scripts/combine_predret_v2_sset10_and_impact.R) 
+
+## Metabolite identification
+
+Dataset ```Impact``` contains the data used in the metabolite identification
+experiment:
+
+- 
