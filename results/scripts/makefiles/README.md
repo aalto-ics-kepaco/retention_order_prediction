@@ -25,7 +25,20 @@ where the numbers correspond to the target systems.
 ## Combining the results using the Makefile
 
 The different results can be combined using the [Makefile](Makefile) in combination
-with the R-script [combine_results.R](../combine_results.R).
+with the R-script [combine_results.R](../combine_results.R):
 
-Those can be combined using the Makefile in 'combine_results' together with the r-script
-'combine_results.R'.
+```bash
+make APFT=False FEATSCAL=noscaling SYSSET=10
+```
+
+The resulting files will be:
+
+- ```accuracies_allpairsfortest=False_featurescaler=noscaling_sysset=10.csv```
+- ```correlations_allpairsfortest=False_featurescaler=noscaling_sysset=10.csv```
+- ...
+
+which are simple the concatenations of the different result files. Please note: 
+The need for the [combine_results.R](../combine_results.R) script aroses from the
+fact, that the Python [pandas.DataFrame.to_csv](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html#pandas-dataframe-to-csv) 
+method, does not enforce any order of the columns. In R the function ```rbind``` 
+takes care about the matching columns when concatenating ```data.frame```s.
