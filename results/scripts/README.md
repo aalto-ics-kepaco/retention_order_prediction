@@ -46,6 +46,6 @@ Parameters:
   - ```featurescaler```: Feature scaler used for the molecular features. (see also: [```evaluate_on_target_systems```](src/evaluation_scenarios_cls.py#L209))
   - ```sysset```: Which (sub)set of systems from the specified dataset should be used, e.g., [the used in the paper (=10)](results/raw/PredRet/v2/config_local.json#L7).
 
-The different experiments evaluated in the paper require different ```load_*``` 
+The different experiments evaluated in the paper require different [```load_*```](helper.R#L246)
 functions. Those are provided in the [helper.R](helper.R) script. Further examples
 how to load the results can be found in the report / summary [R-markdown script](ECCB2018.Rmd).
