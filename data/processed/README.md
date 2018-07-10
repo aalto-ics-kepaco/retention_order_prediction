@@ -37,6 +37,10 @@ Note: The MS/MS-spectra are not included in this repository. The MS/MS-based sco
 have been calculated using Input Output Kernel Regression (IOKR) [(Brouard et al., 2016)][@iokr_paper]
 as described in the paper.
 
+The repository also contains a toy-dataset ```Metabolite_identification_toy_dataset```
+than can be used as template for the required structure by the software and for
+debugging perposes.
+
 ### ```candidates/rts_msms.csv```
 
 Csv-file with three columns: "inchikey", "inchi", "rt". The "inchikey" serves as
@@ -50,6 +54,12 @@ each MS/MS-spectra.
 - INCHIKEY: InChI-key of the molecular structure from the ```Impact``` dataset. Internally used as identifier for the spectra.
 
 Csv-file with "inchi", "fp1", "fp2", ... columns. The "inchi" identifies each 
+molecular candidate.
+
+### ```candidates/scoring/maccs_count/scoring=ML_spec=CCMSLIB_id=INCHIKEY.csv```
+
+Csv-file with two columns: "id1" and "score". "id1" referes here to the InChI of
+each molecular structure and "score" to the MS/MS-based IOKR score.
 
 ## References
 
