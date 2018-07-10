@@ -38,8 +38,6 @@ knitr::opts_chunk$set(echo = TRUE)
 library (ggplot2)
 library (data.table)
 library (knitr)
-library (OrgMassSpecR)
-library (shiny)
 
 base_dir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/"
 
