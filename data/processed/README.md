@@ -44,4 +44,4 @@ each MS/MS-spectra.
 
 ## References
 
-[@iokr_paper] https://academic.oup.com/bioinformatics/article/32/12/i28/2288626 : "Fast metabolite identification with Input Output Kernel Regression, Brouard, C., Shen, H., Dührkop, K., d’Alché-Buc, F., Böcker, S., and Rousu, J. Bioinformatics, 2016"
+[@iokr_paper]: https://academic.oup.com/bioinformatics/article/32/12/i28/2288626 "Fast metabolite identification with Input Output Kernel Regression, Brouard, C., Shen, H., Dührkop, K., d’Alché-Buc, F., Böcker, S., and Rousu, J. Bioinformatics, 2016"
