@@ -24,9 +24,15 @@ There are [scripts](../scripts) for each dataset to be created from the [raw](..
 - ```s10_imp_no3D```: Combination of the PredRet and Impact (without MSMS) data
   - Data-set combination and fingerprint calculation: [combine_predret_v2_sset10_and_impact.R](../scripts/combine_predret_v2_sset10_and_impact.R) 
 
-## Metabolite identification
+## Metabolite identification using tandem Mass Spectrometry (MS/MS) data
 
 Dataset ```Impact``` contains the data used in the metabolite identification
 experiment:
 
-- 
+- ```candidates/rts_msms.csv```: Retention times for each MS/MS-spectra with molecular structure
+- ```candidates/fingerprints/```: Fingerprints for the molecular candidates of each MS/MS-spectra
+- ```candidates/scorings/```: MS/MS-spectra based scores for all molecular candidates
+
+Note: 
+
+- asd
