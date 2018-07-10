@@ -54,7 +54,12 @@ each MS/MS-spectra.
 - INCHIKEY: InChI-key of the molecular structure from the ```Impact``` dataset. Internally used as identifier for the spectra.
 
 Csv-file with "inchi", "fp1", "fp2", ... columns. The "inchi" identifies each 
-molecular candidate.
+molecular candidate. The candidates' fingerprints can be calculated using the 
+[calculate_fingerprints_for_impact_candidates.R](../scripts/calculate_fingerprints_for_impact_candidates.R)
+script. For some molecular structure the calculation of the molecular fingerprints
+might fail. In this case the [clean_up_impact_candidate_lists.R](../scripts/clean_up_impact_candidate_lists.R)
+script can be used, to filter those candidates and modify the corresponding scoring 
+files (see next Section).
 
 ### ```candidates/scoring/maccs_count/scoring=ML_spec=CCMSLIB_id=INCHIKEY.csv```
 
