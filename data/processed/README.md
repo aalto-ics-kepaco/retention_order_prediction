@@ -33,6 +33,15 @@ experiment:
 - ```candidates/fingerprints/```: Fingerprints for the molecular candidates of each MS/MS-spectra
 - ```candidates/scorings/```: MS/MS-spectra based scores for all molecular candidates
 
-Note: 
+Note: The MS/MS-spectra are not included in this repository. The MS/MS-based scores
+have been calculated using Input Output Kernel Regression (IOKR) [(Brouard et al., 2016)][@iokr_paper]
 
-- asd
+### ```candidates/rts_msms.csv```
+
+Csv-file with three columns: "inchikey", "inchi", "rt". The "inchikey" serves as
+identifier for the MS/MS-spectra. The "rt" column contains the retention time of 
+each MS/MS-spectra.
+
+## References
+
+[@iokr_paper] https://academic.oup.com/bioinformatics/article/32/12/i28/2288626 : "Fast metabolite identification with Input Output Kernel Regression, Brouard, C., Shen, H., Dührkop, K., d’Alché-Buc, F., Böcker, S., and Rousu, J. Bioinformatics, 2016"
