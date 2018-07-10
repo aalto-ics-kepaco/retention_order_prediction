@@ -3,6 +3,11 @@ title: "Liquid-Chromatography Retention Order Prediction for Metabolite Identifi
 author: "Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu"
 date: "July 01, 2018"
 output: html_document
+knit: (function(inputFile, encoding) { 
+      out_dir <- '../';
+      rmarkdown::render(inputFile,
+                        encoding=encoding, 
+                        output_file=file.path(dirname(inputFile), out_dir, 'ECCB2018.html')) })
 ---
 
 ```{r, eval = FALSE, echo = FALSE}
