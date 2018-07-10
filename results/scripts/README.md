@@ -32,4 +32,12 @@ Parameters:
 - ```base_dir```: Directory of the processed input data of a certain dataset, e.g. ```PredRet/v2```
 - ```predictor```: Which feature was used to represent the molecules, e.g., MACCS fingerprints.
 - ```kernel```: Which kernel was used on top of the molecular features, e.g., Tanimoto kernel.
-- ```pair_params```: Paramters for the training pair generation from the retention times for the RankSVM (see function [get_pairs_from_order_graph](src/rank_svm_cls.py#L60) for details.)
+- ```pair_params```: Paramters for the training pair generation from the retention times for the RankSVM (see for example function [```get_pairs_from_order_graph```](src/rank_svm_cls.py#L60) for details)
+  - In the paper all the results are calculated using the paramters shown in the example
+  - For SVR this paramter can be set to ```NULL```
+- ```feature_type```: Feature type used in the RankSVM. 
+  - Only ```"difference"``` is supported and used in the paper.
+  - For SVR this paramter can be set to ```NULL```
+- ```flavor```: List of parameters used to identify the some settings during the evaluation:
+  - ```allpairsfortest```: See parameter documentation of [```find_hparan_ranksvm```](src/model_selection_cls.py#L198).
+  - ```featurescaler```: Feature scaler used for the molecular features. (see also: [```evaluate_on_target_systems```](src/evaluation_scenarios_cls.py#L209))
