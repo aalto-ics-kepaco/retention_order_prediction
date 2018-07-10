@@ -5,7 +5,7 @@ date: "July 01, 2018"
 output: html_document
 ---
 
-```{r}
+```{r, eval = FALSE, echo = FALSE}
 ####
 #
 # The MIT License (MIT)
@@ -43,9 +43,7 @@ library (shiny)
 
 base_dir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/"
 
-source (paste (base_dir, "results/scripts/R/tools/evaluate_rank_correlations.R", sep = "/"))
-source (paste (base_dir, "results/scripts/R/tools/kernel_tools.R", sep = "/"))
-source (paste (base_dir, "results/scripts/R/helper.R", sep = "/"))
+source (paste (base_dir, "results/scripts/helper.R", sep = "/"))
 
 # Pre-processed retention time data
 sdir <- paste (base_dir, "data/processed/PredRet/v2/", sep = "/")
@@ -391,6 +389,8 @@ Average percentage of correctly identified molecular structures for different va
 of $D$ (Figure 5).
 
 ```{r, fig.align = "center", fig.width = 6, fig.height = 3, eval = TRUE, echo = FALSE}
+std_err <- function (x) sd(x) / sqrt (length(x))
+
 data_greater0 <- NULL
 data_equal0 <- NULL
 

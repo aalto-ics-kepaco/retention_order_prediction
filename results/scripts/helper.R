@@ -1,28 +1,30 @@
+####
+#
+# The MIT License (MIT)
+#
+# Copyright 2018 Eric Bach <eric.bach@aalto.fi>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal 
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is furnished
+# to do so, subject to the following conditions:
+#    
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+####
+
 require (data.table)
-
-# Function to plot the 
-
-# Function to get the number of molecules in a target system shared with a set of other systems
-get_number_of_shared_molecules <- function (target_systems, training_systems, dt) {
-    res <- data.table (target_system = character(), 
-                       n_shared_molecules = numeric(), 
-                       n_molecules = numeric(),
-                       p_shared_molecules = numeric())
-    setkey (res, "target_system")
-    
-    for (target_system in target_systems) {
-        inchis_target   <- as.character (dt[system == target_system, inchi])
-        inchis_training <- as.character (dt[system %in% setdiff (training_systems, target_system), inchi])
-        
-        res <- rbind (res, data.table (target_system = target_system,
-                                       n_shared_molecules = length (intersect (inchis_target, inchis_training)), 
-                                       n_molecules = length (inchis_target),
-                                       p_shared_molecules = -1))
-        res$p_shared_molecules = (100 * res$n_shared_molecules) / res$n_molecules
-    }
-    
-    return (res)
-}
 
 #' Make string out of list by concatenating the list names
 #' and their corresponding list values.
