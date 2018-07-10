@@ -21,7 +21,7 @@ There are [scripts](../scripts) for each dataset to be created from the [raw](..
 - ```PredRet```:
   - Pre-processing: [preprocessing_PredRet_v2.Rmd](../scripts/preprocessing_PredRet_v2.Rmd)
   - Fingerprint calculation: [calculate_fingerprints_for_PredRet_v2_molecules.R](../scripts/calculate_fingerprints_for_PredRet_v2_molecules.R)
-- ```s10_imp_no3D```: Combination of the PredRet and Impact (without MSMS) data
+- ```s10_imp_no3D```: Combination of the PredRet and Impact (without MS/MS-spectrum) data
   - Data-set combination and fingerprint calculation: [combine_predret_v2_sset10_and_impact.R](../scripts/combine_predret_v2_sset10_and_impact.R) 
 
 ## Metabolite identification using tandem Mass Spectrometry (MS/MS) data
@@ -29,18 +29,27 @@ There are [scripts](../scripts) for each dataset to be created from the [raw](..
 Dataset ```Impact``` contains the data used in the metabolite identification
 experiment:
 
-- ```candidates/rts_msms.csv```: Retention times for each MS/MS-spectra with molecular structure
-- ```candidates/fingerprints/```: Fingerprints for the molecular candidates of each MS/MS-spectra
+- ```candidates/rts_msms.csv```: Retention times for each MS/MS-spectrum with molecular structure
+- ```candidates/fingerprints/```: Fingerprints for the molecular candidates of each MS/MS-spectrum
 - ```candidates/scorings/```: MS/MS-spectra based scores for all molecular candidates
 
 Note: The MS/MS-spectra are not included in this repository. The MS/MS-based scores
 have been calculated using Input Output Kernel Regression (IOKR) [(Brouard et al., 2016)][@iokr_paper]
+as described in the paper.
 
 ### ```candidates/rts_msms.csv```
 
 Csv-file with three columns: "inchikey", "inchi", "rt". The "inchikey" serves as
 identifier for the MS/MS-spectra. The "rt" column contains the retention time of 
 each MS/MS-spectra.
+
+### ```candidates/fingerprints/maccs_count/fps_maccs_count_list=ML_spec=CCMSLIB_id=INCHIKEY.csv```
+
+- ML: Molecular formula of the molecular structure used to query the candidate database, e.g. [Pubchem](https://pubchem.ncbi.nlm.nih.gov/).
+- CCMSLIB: [GNPS](https://gnps.ucsd.edu/ProteoSAFe/static/gnps-splash.jsp) ID if the MS/MS-spectrum mapped to the molecular structure from the ```Impact``` dataset.
+- INCHIKEY: InChI-key of the molecular structure from the ```Impact``` dataset. Internally used as identifier for the spectra.
+
+Csv-file with "inchi", "fp1", "fp2", ... columns. The "inchi" identifies each 
 
 ## References
 
