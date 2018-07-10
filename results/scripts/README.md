@@ -27,3 +27,9 @@ load_baseline_single_results (
     flavor = list (allpairsfortest = "True", featurescaler = "noscaling", sysset = 10))
 ```
 
+Parameters:
+- ```measure```: Which evaluation measure to load, e.g., accuracy, correlation, ... (see also: [evaluation_scenarios_cls.py](src/evaluation_scenarios_cls.py#L464))
+- ```base_dir```: Directory of the processed input data of a certain dataset, e.g. ```PredRet/v2```
+- ```predictor```: Which feature was used to represent the molecules, e.g., MACCS fingerprints.
+- ```kernel```: Which kernel was used on top of the molecular features, e.g., Tanimoto kernel.
+- ```pair_params```: Paramters for the training pair generation from the retention times for the RankSVM (see function [get_pairs_from_order_graph](src/rank_svm_cls.py#L60) for details.)
