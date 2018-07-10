@@ -13,7 +13,9 @@ require (data.table)
 # 0-a) Which fingerprint defintion should be considered?
 fps_def <- "maccs_count"
 
-sdir <- "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/data/processed/Impact/candidates/"
+sdir <- stop ("DEFINE BASE-PATH CONTAINING INPUT DATA!") 
+# Eg: sdir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/data/processed/Impact/candidates/"
+
 fps_dir <- paste0 (sdir, "/fingerprints/", fps_def, "/")
 scorings_dir <- paste0 (sdir, "/scorings/before_cleaning_up/")
 scorings_dir_out <- paste0 (sdir, "/scorings/", fps_def, "/")
