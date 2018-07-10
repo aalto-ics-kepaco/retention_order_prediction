@@ -1,10 +1,10 @@
 ## Accept the following parameters
-# - allpairsfortest
-# - embso
-# - featurescaler
-# - ltso
-# - percfortrain
-# - sysset
+# - allpairsfortest: APFT {True, False}
+# - embso: EMBSO {True, False}
+# - featurescaler: FEATSCAL {, ...}
+# - ltso: LTSO {True, False}
+# - percfortrain: PERC {0, 10, ..., 100}
+# - sysset: SYSSET {10, imp, ...}
 
 # Define sources
 
@@ -72,15 +72,6 @@ SOURCE_COR_WC:=$(SOURCE_COR_WC)_sysset=$(SYSSET)
 SOURCE_GSBP_WC:=$(SOURCE_GSBP_WC)_sysset=$(SYSSET)
 SOURCE_GSR_WC:=$(SOURCE_GSR_WC)_sysset=$(SYSSET)
 SOURCE_SS_WC:=$(SOURCE_SS_WC)_sysset=$(SYSSET)
-endif
-
-ifeq ($(USECOLDESC),)
-else
-SOURCE_ACC_WC:=$(SOURCE_ACC_WC)_usecoldesc=$(USECOLDESC)
-SOURCE_COR_WC:=$(SOURCE_COR_WC)_usecoldesc=$(USECOLDESC)
-SOURCE_GSBP_WC:=$(SOURCE_GSBP_WC)_usecoldesc=$(USECOLDESC)
-SOURCE_GSR_WC:=$(SOURCE_GSR_WC)_usecoldesc=$(USECOLDESC)
-SOURCE_SS_WC:=$(SOURCE_SS_WC)_usecoldesc=$(USECOLDESC)
 endif
 
 # Get the source files
