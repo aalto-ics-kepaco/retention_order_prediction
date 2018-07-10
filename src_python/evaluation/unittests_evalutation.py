@@ -21,8 +21,8 @@ class DummyRankingModel2:
         return [-np.sum(X)]
 
 def make_candidate_data():
-    base_dir = "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/"
-    input_dir_candidates = base_dir + "/data/processed/Impact/toy_candidates/"
+    base_dir = "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/"
+    input_dir_candidates = base_dir + "/data/processed/Metabolite_identification_toy_data/"
 
     model = {"ranking_model": DummyRankingModel2(tanimoto_kernel),
              "kernel_params": {},

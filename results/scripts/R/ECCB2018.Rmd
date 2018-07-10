@@ -230,6 +230,27 @@ ggplot (df_acc_3_1_4_multiple_systems[, .(mean_accuracy = mean (accuracy)),
     theme_bw()
 ```
 
+Effect of training data from other chromatographic system in addition per target
+system (Figure not included in the paper):
+
+```{r, fig.align = "center", fig.width = 16, fig.height = 3, eval = TRUE, echo = FALSE}
+df_acc_3_1_4_multiple_systems <- rbind (
+    bl_rsvm_p[d_lower == 0 & d_upper == Inf],
+    bl_svr_p[d_lower == 0 & d_upper == Inf],
+    aoo_rsvm_p[d_lower == 0 & d_upper == Inf],
+    aoo_svr_p[d_lower == 0 & d_upper == Inf])[embso == TRUE]
+ggplot (df_acc_3_1_4_multiple_systems, 
+        aes (x = perc, y = accuracy, color = estimator, 
+             linetype = sysset)) +
+    geom_point (size = 2) + geom_line (size = 0.5) +
+    facet_grid(~target)+ 
+    xlab ("Percentage of target system molecules used for training") +
+    ylab ("Pairwise accuracy\n(averaged across all target systems)") +
+    guides (color = guide_legend (title = "Method"),
+            linetype = guide_legend (title = "Training set")) +
+    theme_bw()
+```
+
 Result shown in Table 4.
 ```{r, eval = TRUE, echo = FALSE, results = "asis"}
 kable (rbind (
