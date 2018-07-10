@@ -3,6 +3,11 @@
 ## ```ECCB2018.Rmd```
 
 R-Markdown that produces all the Tables and Figures presented in the paper.
+(Re-)compilation of the [HTML report](../ECCB2018.html) containing the paper results:
+
+```bash
+R -e "rmarkdown::render('ECCB2018.Rmd',output_file='../ECCB2018.html')"
+```
 
 ## ```helper.R```
 
