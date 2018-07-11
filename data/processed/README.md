@@ -66,6 +66,8 @@ files (see next Section).
 Csv-file with two columns: "id1" and "score". "id1" referes here to the InChI of
 each molecular structure and "score" to the MS/MS-based IOKR score.
 
+## Fingerprint calculation
+
 ## References
 
 [@iokr_paper]: https://academic.oup.com/bioinformatics/article/32/12/i28/2288626 "Fast metabolite identification with Input Output Kernel Regression, Brouard, C., Shen, H., Dührkop, K., d’Alché-Buc, F., Böcker, S., and Rousu, J. Bioinformatics, 2016"

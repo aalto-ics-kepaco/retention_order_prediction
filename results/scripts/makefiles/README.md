@@ -1,9 +1,18 @@
 # Combining evaluation results from parallel runs
 
-The implementation of the [main evaluation script](src/evaluation_scenarios_main.py)
+The implementation of the [main evaluation script](src/evaluation_scenarios_main.py#L96)
 allows to run the evaluation, e.g., the experiments related to the order prediction 
 presented in Section 3.1, on each target system in a different job, e.g., on a
-cluster system. 
+cluster system. By setting the TSYSIDX paramter to an integer ranging from 0 to 
+n_target_systems - 1 the evaluation can be restricted to the desired target system:
+
+```bash
+python src/evaluation_scenarios_main.py ranksvm baseline_single 10 1 results/raw/PredRet/v2/config.json 2 False
+```
+
+The command will result on evaluation result files with the prefix ```01_*```. 
+If the set of systems would be for example ```["S0", "S1", "S2"]```, than the
+target system would be ```S1```.
 
 ## Results per target system
 
@@ -14,7 +23,7 @@ consider five chromatographic systems (can be though of as sub(data)sets), i.e.,
 and ```"LIFE_old"```. Each of this system can serve as _target system_ for the 
 analysis, i.e, it is the system in which the performence is evaluated, and the 
 corresponding performance measures are stored for each target system separetly 
-([Click here for an example output.](results/raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccs/tanimoto/baseline_single)):
+([Click here for an example output.](results/raw/PredRet/v2/final_ECCB2018_paper/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccs/tanimoto/baseline_single)):
 
 - ```00_accuracies_allpairsfortest=False_featurescaler=noscaling_sysset=10.csv```
 - ```01_accuracies_allpairsfortest=False_featurescaler=noscaling_sysset=10.csv```,

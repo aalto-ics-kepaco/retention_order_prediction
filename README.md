@@ -1,27 +1,59 @@
 # Overview
 
+Scripts used to run the experiment presented in the paper:
+
+"Liquid-Chromatography Retention Order Prediction for Metabolite Identification"
+
+by Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu
+
+[Summary of the results](results/ECCB2018.html) shown in the paper (File needs
+to be downloaded and opened with a web-browser.). 
+
 # Installation
 
-## Required R packages
-- data.table
-- Matrix
-- obabel2R
-- rcdk
-- fingerprint
+There is no further installation required. The scripts run out of the box, if 
+all the package dependencies are sattisfied. 
 
-## Required programms
-- open babel
+## Order prediction and evaluation code
 
-## Required python libraries
+The order predictor and evaluation scripts are implemented in Python. The code 
+has been tested with Python 3.5 and 3.6. The following packages are required:
 
-Code has only be tested with python 3.5 and 3.6.
+- scipy >= 0.19.1
+- json >= 2.0.9
+- numpy >= 1.13.1
+- joblib >= 0.11
+- pandas >= 0.20.3
+- sklearn >= 0.19.0
+- networkx >= 2.0
+- matplotlib >= 2.1 (optional)
+
+## Data pre-processing and evaluation report creation
+
+The data pre-processing scripts as well as the script to reproduce the results 
+shown in the paper are written in R. For the development R version 3.4 was used. 
+The following packages are required:
+
+- Reproduction of results: [ECCB2018.Rmd](results/scripts/ECCB2018.Rmd)
+    - data.table 
+    - ggplot2 
+    - knitr 
+- Reproduction of data pre-processing:
+    - Matrix
+    - [obabel2R](https://rdrr.io/github/stanstrup/obabel2R/)
+    - [rcdk](https://github.com/rajarshi/cdkr) (used for [fingerprint calculation](data/processed/README.md#fingerprint-calculation))
+    - fingerprint
+
+Furthermore, the [OpenBabel](http://openbabel.org/wiki/Main_Page) (>= 2.3.2) 
+command line tool ```obabel``` must be installed __only if__ the data 
+pre-processing needs to be repeated.
 
 # Usage
 
 All experiments of the paper can be reproduced by using the calling the [evaluation_scenarios_main.py](src/evaluation_scenarios_main.py)
 script with the proper parameters:
 
-```bash
+```
 usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <PATH/TO/CONFIG.JSON> <NJOBS> <DEBUG>
   ESTIMATOR:           {'ranksvm', 'svr'}, which order predictor to use.
   SCENARIO:            {'baseline', 'baseline_single', 'baseline_single_perc', 'all_on_one', 'all_on_one_perc', 'met_ident_perf_GS_BS'}, which experiment to run.
@@ -32,12 +64,20 @@ usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <P
   DEBUG:               {True, False}, should we run a smoke test.
 ```
 
-For example: To reproduce Table 3 in the paper the following function calls are 
-need:
+| __SCENARIO__ | __Description__ | __Reference in the Paper__ |
+| ------------ | --------------- | -------------------------- |
+| [```baseline_single```](src/evaluation_scenarios_main.py#L708) | Single system used as training and target | Table 3, Table 4 (first two columns) |
+| [```baseline_single_perc```](src/evaluation_scenarios_main.py#L737) | Single system used as training and target. Different percentage of data used for trainging. | Figure 4 (stroked lines) |
+| [```all_on_one```](src/evaluation_scenarios_main.py#L615) | All systems used for training. Single system used as target. Target system in training (LTSO): True & False | Table 4, LTSO = True 3. & 4. column, LTSO = False 5. & 6. column |
+| [```all_on_one_perc```](src/evaluation_scenarios_main.py#L662) | All systems used for training. Single system used as target. Varying percentage of target system data used for training | Figure 4 (solid lines) |
+
+## Example: Reproducing results shown in Table 3:
+
+The following function calls are need:
 
 __MACCS counting fingerprints:__
 
-```bash
+```
 python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
 ```
 
@@ -88,7 +128,7 @@ becomes
 
 Then run:
 
-```bash
+```
 python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
 ```
 
@@ -104,5 +144,7 @@ results/PredRet/v2
                                     └── tanimoto
                                         └── baseline_single
 ```
+
+How the results can be loaded and visualized is described [here](results/scripts/README.md#helperr-load-results-in-to-r).
 
 # Citation
