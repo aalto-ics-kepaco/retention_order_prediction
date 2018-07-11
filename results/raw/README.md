@@ -1,12 +1,16 @@
+# Raw result files
+
 For each dataset respectively different pre-processing the following
 to raw results are available:
 
 * **debug**: outputs/results produced by the debug runs
 * **final**: outputs/results for productive use
+
 # Experiment settings
 
 The model, data and feature parameters for different experimental settings are 
-summarized in json-files, that are specific to each data set, e.g. _results/raw/PredRet/v2/\*.json_).
+summarized in json-files, that are specific to each data set, e.g. [_raw/PredRet/v2/\*.json_](results/raw/PredRet/v2/config.json) 
+and [_results/raw/s10_imp_no3D/\*.json](results/raw/s10_imp_no3D/config.json).
 
 ## ```"data"```
 
