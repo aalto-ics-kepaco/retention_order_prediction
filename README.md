@@ -56,8 +56,8 @@ results/PredRet/v2
                     └── ranksvm_slacktype=on_pairs
                         └── allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph
                             └── difference
-                                └── maccs
-                                    └── tanimoto
+                                └── maccsCount_f2dcf0b3
+                                    └── minmax
                                         └── baseline_single
 ```
 
@@ -92,6 +92,17 @@ Then run:
 python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
 ```
 
-The results will go into a different folder.
+The results will be stored into:
+
+```
+results/PredRet/v2
+                └── final
+                    └── ranksvm_slacktype=on_pairs
+                        └── allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph
+                            └── difference
+                                └── maccs
+                                    └── tanimoto
+                                        └── baseline_single
+```
 
 # Citation
