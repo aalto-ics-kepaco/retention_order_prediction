@@ -100,8 +100,8 @@ def parse_sysargs (arguments):
         # RankSVM
         if estimator == "ranksvm":
             pair_params = d_config["model"]["ranksvm"]["pair_params"]
-            feature_type = "difference"
-            slack_type = "on_pairs"
+            feature_type = d_config["model"]["ranksvm"]["feature_type"]
+            slack_type = d_config["model"]["ranksvm"]["slack_type"]
         else:
             pair_params = None
             feature_type = None
