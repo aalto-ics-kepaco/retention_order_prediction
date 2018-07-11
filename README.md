@@ -1,6 +1,15 @@
 # Overview
 
+Scripts used to run the experiment presented in the paper:
+
+"Liquid-Chromatography Retention Order Prediction for Metabolite Identification"
+
+by Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu
+
 # Installation
+
+There is no further installation required. The scripts run out of the box, if 
+all the package dependencies are sattisfied. 
 
 ## Order prediction and evaluation code
 
@@ -24,12 +33,12 @@ Teh following packages are required:
 
 - data.table
 - Matrix
-- obabel2R
-- rcdk
+- [obabel2R](https://rdrr.io/github/stanstrup/obabel2R/)
+- [rcdk](https://github.com/rajarshi/cdkr)
 - fingerprint
 
 Furthermore, the [OpenBabel](http://openbabel.org/wiki/Main_Page) (>= 2.3.2) 
-command line tool ```obabel``` must be installed __ only if__ the data 
+command line tool ```obabel``` must be installed __only if__ the data 
 pre-processing needs to be repeated.
 
 ## Required python libraries
