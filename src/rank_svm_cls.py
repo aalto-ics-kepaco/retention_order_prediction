@@ -43,8 +43,6 @@ from collections import OrderedDict, deque
 
 import numpy as np
 import scipy as sp
-import cvxpy as cvx
-import mosek
 import itertools
 import warnings
 warnings.simplefilter ('ignore', sp.sparse.SparseEfficiencyWarning)
