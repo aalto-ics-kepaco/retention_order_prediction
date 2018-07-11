@@ -13,9 +13,7 @@ R -e "rmarkdown::render('ECCB2018.Rmd',output_file='../ECCB2018.html')"
 
 Set of functions that allows to load the results of the experiments into R [```data.table```](https://cran.r-project.org/web/packages/data.table/)s.
 
-### Example 
-
-#### Load results
+### Example: Load results
 
 Load the results of the experiment evaluating the __pairwise prediction__ (```"accuracy"```)
 performance using __RankSVM__ (```"ranksvm_slacktype=on_pairs"```) when trained 
@@ -57,7 +55,7 @@ The different experiments evaluated in the paper require different [```load_*```
 functions. Those are provided in the [helper.R](helper.R) script. Further examples
 how to load the results can be found in the report / summary [R-markdown script](ECCB2018.Rmd).
 
-#### Access results
+### Example: Access results
 
 ```R
 > res[d_lower == 0 & d_upper == Inf]
@@ -69,3 +67,10 @@ how to load the results can be found in the report / summary [R-markdown script]
  4:   0.8484       0.0083            RIKEN            RIKEN       0     Inf
  5:   0.8019       0.0086   UFZ_Phenomenex   UFZ_Phenomenex       0     Inf
 ````
+
+- ```source``` refers in the result files to the system(s) used for training. 
+- ```d_lower``` and ```d_upper``` refers here to the paramters used to calculate the __test__ pairs for evaluation.
+    - ```0``` and ```Inf``` means, that all possible pairs are used for testing (as the paper defines the _Pairwise accuracy_ in Section 3.1.2)
+    - The result files also contain other ```d_lower``` and ```d_upper``` pairs.
+    - Those can be used to, e.g., evaluate the pairwise prediction accuracy for nearby eluting molecules, i.e. with small retention time difference: ```d_lower = 0``` and ```d_upper = 4```.
+    - Please look at the [source code generating the pairwise accuracies](src/evaluation_scenarios_cls.py#L457).
