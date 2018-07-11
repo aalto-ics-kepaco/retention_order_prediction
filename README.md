@@ -6,7 +6,8 @@ Scripts used to run the experiment presented in the paper:
 
 by Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu
 
-[Summary of the results](results/ECCB2018.html) shown in the paper. 
+[Summary of the results](results/ECCB2018.html) shown in the paper (File needs
+to be downloaded and opened with a web-browser.). 
 
 # Installation
 
