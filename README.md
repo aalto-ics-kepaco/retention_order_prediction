@@ -35,7 +35,7 @@ usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <P
 For example: To reproduce Table 3 in the paper the following function calls are 
 need:
 
-MACCS counting fingerprints:
+__MACCS counting fingerprints:__
 
 ```bash
 python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
@@ -47,4 +47,38 @@ python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/ra
 - [```results/raw/PredRet/v2/config.json```](results/raw/PredRet/v2/config.json): Configuration of the experiment, e.g. [molecular features and kernels](results/raw/PredRet/v2/config.json#L28).
 - ```2```: Number of jobs/cpus used for the [hyper-parameter search](src/model_selection_cls.py#L370).
 - ```False```: Not running in debug-mode. Results will be stored in the [final](results/raw/PredRet/v2/final) directory.
+
+__MACCS binary fingerprints:__
+
+Modify the [```results/raw/PredRet/v2/config.json```](results/raw/PredRet/v2/config.json)
+configuration file:
+
+```json
+"molecule_representation": {
+  "kernel": "minmax",
+  "predictor": ["maccsCount_f2dcf0b3"],
+  "feature_scaler": "noscaling",
+  "poly_feature_exp": false
+}
+```
+
+becomes
+
+```json
+"molecule_representation": {
+  "kernel": "tanimoto",
+  "predictor": ["maccs"],
+  "feature_scaler": "noscaling",
+  "poly_feature_exp": false
+}
+```
+
+Then run:
+
+```bash
+python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
+```
+
+The results will go into a different folder.
+
 # Citation
