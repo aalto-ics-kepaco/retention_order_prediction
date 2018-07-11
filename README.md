@@ -32,8 +32,12 @@ usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <P
   DEBUG:               {True, False}, should we run a smoke test.
 ```
 
-For example: To reproduce Table 3 in the paper the following function calls are 
-need:
+| SCENARIO | Description | Reference in the Paper |
+| -------- | ----------- | ---------------------- |
+
+## Example: Reproducing results shown in Table 3:
+
+The following function calls are need:
 
 __MACCS counting fingerprints:__
 
