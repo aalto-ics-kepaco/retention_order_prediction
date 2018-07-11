@@ -93,3 +93,10 @@ No paramters are set here.
 }
 ```
 
+Parameters defining the molecular representation and the kernels used to measure
+the similarity:
+
+- _kernel_: String, which kernel to use. Currently supported are ```"tanimoto"``` and ```"minmax"``` for fingerprints.
+- _predictor_: list of strings, which fingerprints should be used. In the paper we use ```["maccs"]``` and ```["maccsCount_f2dcf0b3"]```.
+- _feature_scaler_: How the input molecular features, e.g. fingerprint, should be scaled before use. (in paper = ```"noscaling"```)
+- _poly_feature_exp_: [See code](src/evaluation_scenarios_cls.py#L241) (in paper = false)
