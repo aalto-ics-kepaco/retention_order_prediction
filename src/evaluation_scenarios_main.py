@@ -67,6 +67,20 @@ def parse_sysargs (arguments):
 
     :return: parsed parameters
     """
+    if len (arguments) == 1:
+        print ("usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> "
+               "<TSYSIDX> <PATH/TO/CONFIG.JSON> <NJOBS> <DEBUG>\n"
+               "  ESTIMATOR:           {'ranksvm', 'svr'}, which order predictor to use.\n"
+               "  SCENARIO:            {'baseline', 'baseline_single', 'baseline_single_perc', 'all_on_one',"
+               " 'all_on_one_perc', 'met_ident_perf_GS_BS'}, which experiment to run.\n"
+               "  SYSSET:              {10, imp, 10_imp}, which set of systems to train on.\n"
+               "  TSYSIDX:             {-1, 0, ..., |sysset| - 1}, which target system to use for evaluation.\n"
+               "  PATH/TO/CONFIG.JSON: configuration file, e.g. PredRet/v2/config.json\n"
+               "  NJOBS:               How many jobs should run in parallel for hyper-parameter estimation?\n"
+               "  DEBUG:               {True, False}, should we run a smoke test.")
+
+        exit(1)
+
     # Which estimator should be used? Currently available: "ranksvm" and "svr".
     estimator = arguments[1]
 
@@ -761,6 +775,11 @@ if __name__ == "__main__":
             write_out_results (output_dir, ofile_prefix, param_suffixes, results)
 
     elif scenario == "met_ident_perf_GS_BS": # GS_BS means simple grid-search with boot-strapping
+        if estimator == "svr":
+            raise NotImplementedError ("Support Vector Regression is currently supported "
+                                       "for the metabolite identification experiments. "
+                                       "However, the required modifications are very little.")
+
         param_suffixes = {"sysset": sysset, "featscaler": feature_scaler, "usecoldesc": False}
 
         # Model input / output directory
