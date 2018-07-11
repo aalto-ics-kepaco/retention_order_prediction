@@ -34,16 +34,12 @@ Teh following packages are required:
 - data.table
 - Matrix
 - [obabel2R](https://rdrr.io/github/stanstrup/obabel2R/)
-- [rcdk](https://github.com/rajarshi/cdkr)
+- [rcdk](https://github.com/rajarshi/cdkr) (used for [fingerprint calculation](data/processed/README.md#fingerprint-calculation))
 - fingerprint
 
 Furthermore, the [OpenBabel](http://openbabel.org/wiki/Main_Page) (>= 2.3.2) 
 command line tool ```obabel``` must be installed __only if__ the data 
 pre-processing needs to be repeated.
-
-## Required python libraries
-
-Code has only be tested with python 3.5 and 3.6.
 
 # Usage
 
