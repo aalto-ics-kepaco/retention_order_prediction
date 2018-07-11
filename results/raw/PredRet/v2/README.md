@@ -100,3 +100,22 @@ the similarity:
 - _predictor_: list of strings, which fingerprints should be used. In the paper we use ```["maccs"]``` and ```["maccsCount_f2dcf0b3"]```.
 - _feature_scaler_: How the input molecular features, e.g. fingerprint, should be scaled before use. (in paper = ```"noscaling"```)
 - _poly_feature_exp_: [See code](src/evaluation_scenarios_cls.py#L241) (in paper = false)
+
+## ```"application"```
+
+```json
+"application": {
+    "candidate_reranking": {
+      "dp_weight_function": "pwmax",
+      "use_log": false
+    }
+  }
+```
+
+Paramters used for the metabolite identification experiments: 
+
+- _dp_weight_function_: [```"pwmax"```](src/metabolite_identification_cls.py#L501) refers to the edge weight definition used in the paper.
+- _use_log_: If true, than the logarithm of the order penalty term is used. (in paper = false)
+
+Note: Some paramters used for the metabolite identification setting are defined
+directly in the [main evaluation script](src/evaluation_scenarios_main.py#L525).
