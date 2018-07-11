@@ -1,7 +1,7 @@
 {
   "data": {
     "base_dir": "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/",
-    "dataset": "PredRet/v2",
+    "dataset": "s10_imp_no3D",
     "excl_mol_by_struct_only": true,
     "systems": {
       "10": ["Eawag_XBridgeC18", "FEM_long", "RIKEN", "UFZ_Phenomenex", "LIFE_old"],

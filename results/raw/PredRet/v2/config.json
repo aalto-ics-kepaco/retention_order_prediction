@@ -1,0 +1,39 @@
+{
+  "data": {
+    "base_dir": "/home/bach/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/",
+    "dataset": "PredRet/v2",
+    "excl_mol_by_struct_only": true,
+    "systems": {
+      "10": ["Eawag_XBridgeC18", "FEM_long", "RIKEN", "UFZ_Phenomenex", "LIFE_old"]
+    }
+  },
+  "model": {
+    "modelselection": {
+      "all_pairs_for_test": true
+    },
+    "ranksvm": {
+      "pair_params": {
+        "type": "order_graph",
+        "d_upper": 16,
+        "d_lower": 0,
+        "allow_overlap": true,
+        "ireverse": false
+      },
+     "feature_type": "difference",
+     "slack_type": "on_pairs"
+    },
+    "svr": {},
+    "molecule_representation": {
+      "kernel": "minmax",
+      "predictor": ["maccsCount_f2dcf0b3"],
+      "feature_scaler": "noscaling",
+      "poly_feature_exp": false
+    }
+  },
+  "application": {
+    "candidate_reranking": {
+      "dp_weight_function": "pwmax",
+      "use_log": false
+    }
+  }
+}
