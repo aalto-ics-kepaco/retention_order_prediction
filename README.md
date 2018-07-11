@@ -2,6 +2,18 @@
 
 # Installation
 
+## Order prediction and evaluation code
+
+Python packages required:
+- scipy >= 0.19.1
+- json >= 2.0.9
+- numpy >= 1.13.1
+- joblib >= 0.11
+- pandas >= 0.20.3
+- sklearn >= 0.19.0
+- networkx >= 2.0
+- matplotlib >= 2.1 (optional)
+
 ## Required R packages
 - data.table
 - Matrix
