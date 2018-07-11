@@ -4,7 +4,9 @@
 
 ## Order prediction and evaluation code
 
-Python packages required:
+The order predictor and evaluation scripts are implemented in Python. The code 
+has been tested with Python 3.5 and 3.6. The following packages are required:
+
 - scipy >= 0.19.1
 - json >= 2.0.9
 - numpy >= 1.13.1
@@ -14,15 +16,21 @@ Python packages required:
 - networkx >= 2.0
 - matplotlib >= 2.1 (optional)
 
-## Required R packages
+## Data pre-processing and evaluation report creation
+
+The data pre-processing scripts as well as the script to reproduce the results 
+shown in the paper are written in R. For the development R version 3.4 was used. 
+Teh following packages are required:
+
 - data.table
 - Matrix
 - obabel2R
 - rcdk
 - fingerprint
 
-## Required programms
-- open babel
+Furthermore, the [OpenBabel](http://openbabel.org/wiki/Main_Page) (>= 2.3.2) 
+command line tool ```obabel``` must be installed __ only if__ the data 
+pre-processing needs to be repeated.
 
 ## Required python libraries
 
