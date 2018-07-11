@@ -20,7 +20,9 @@
         "d_lower": 0,
         "allow_overlap": true,
         "ireverse": false
-      }
+      },
+     "feature_type": "difference",
+     "slack_type": "on_pairs"
     },
     "svr": {},
     "molecule_representation": {
