@@ -36,6 +36,7 @@ usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <P
 | ------------ | --------------- | -------------------------- |
 | [```baseline_single```](src/evaluation_scenarios_main.py#L708) | Single system used as training and target | Table 3, Table 4 (first two columns) |
 | [```baseline_single_perc```](src/evaluation_scenarios_main.py#L737) | Single system used as training and target. Different percentage of data used for trainging. | Figure 4 (stroked lines) |
+| [```all_on_one```](src/evaluation_scenarios_main.py#L615) | All systems used for training. Single system used as target. Target system in training (LTSO): True & False | Table 4, LTSO = True 3. & 4. column, LTSO = False 5. & 6. column |
 
 ## Example: Reproducing results shown in Table 3:
 
