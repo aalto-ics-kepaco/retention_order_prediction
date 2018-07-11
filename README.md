@@ -113,4 +113,6 @@ results/PredRet/v2
                                         └── baseline_single
 ```
 
+How the results can be loaded and visualized is described [here](results/scripts/README.md#helperr-load-results-in-to-r).
+
 # Citation
