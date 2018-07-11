@@ -230,8 +230,10 @@ def find_hparan_ranksvm (estimator, X, y, param_grid, cv, pair_params, scaler = 
     :param pair_params: dictionary, specifying parameters for the order graph:
         "ireverse": scalar, Should cross-system elution transitivity be included
             0: no, 1: yes
-        "d": scalar, maximum distance of two molecules in the elution order graph
-             to be considered as a pair.
+        "d_lower": scalar, minimum distance of two molecules in the elution order graph
+                   to be considered as a pair.
+        "d_upper": scalar, maximum distance of two molecules in the elution order graph
+                   to be considered as a pair.
         "allow_overlap": scalar, Should overlap between the upper and lower sets
                          be allowed. Those overlaps originate from retention order
                          contradictions between the different systems.
