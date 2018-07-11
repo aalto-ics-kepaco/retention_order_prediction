@@ -35,7 +35,7 @@ Parameters configuring the model selection implemented in [model_selection_cls.p
 ```all_pairs_for_test: true``` means that all available test pairs should be generated
 to calculate the test-score for each hyper-parameter (see also [documentation](src/model_selection_cls.py#L246)).
 
-#### Case: Ranking SVM (```"ranksvm"```)
+### Case: Ranking SVM (```"ranksvm"```)
 
 ```json
 "ranksvm": {
@@ -54,6 +54,7 @@ to calculate the test-score for each hyper-parameter (see also [documentation](s
 Parameters configuring the RankSVM:
 
 - [```pair_params```](src/model_selection_cls.py#L230):
+    - _type_: String, which function should be used to calculate pairs: [```"order_graph"```](src/rank_svm_cls.py#L60) or [```"multiple_system"```](src/rank_svm_cls.py#L225) (equivalent with _ireverse_ is false) 
     - _ireverse_: If true, cross chromatographic-system elution transitivity pairs are used for training. (in paper = false)
     - _allow_overlap_: If true, contradicting elution order pairs from different systems are included in the training. (in paper = true)
     - _d_upper_: Scalar, maximum retention order difference of two molecules from one systems to be considered as __training pair__. (in paper = 16) 
@@ -72,3 +73,23 @@ by the fact, that far apart eluting molecules are easier to distinguish the near
 i.e. molecules with small retention time difference, molecules. Please read the
 source code of the function [```get_pairs_single_system```](src/rank_svm_cls.py#L300)
 for the most simple realisation of such a filtering.
+
+### Case: Support Vector Regression (SVR) (```"svr"```)
+
+```json
+"svr": {}
+```
+
+No paramters are set here.
+
+## ```"molecular_representation"```
+
+```json
+"molecule_representation": {
+  "kernel": "minmax",
+  "predictor": ["maccsCount_f2dcf0b3"],
+  "feature_scaler": "noscaling",
+  "poly_feature_exp": false
+}
+```
+
