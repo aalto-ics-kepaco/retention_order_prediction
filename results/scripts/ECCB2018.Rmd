@@ -51,7 +51,7 @@ source (paste (base_dir, "results/scripts/helper.R", sep = "/"))
 # Pre-processed retention time data
 sdir <- paste (base_dir, "data/processed/PredRet/v2/", sep = "/")
 # Results base-directoy
-sdir_results <- paste (base_dir, "results/raw/PredRet/v2/final/", sep = "/")
+sdir_results <- paste (base_dir, "results/raw/PredRet/v2/final_ECCB2018_paper/", sep = "/")
 sdir_results_base <- paste (base_dir, "results/raw/", sep = "/")
 ```
 
@@ -332,7 +332,7 @@ n_rep <- 1000
 df_top1acc_FINAL_s10_imp <- data.table()
 for (D in D_space) {
     tmp <- load_topkacc_of_reranked_molecules_GS_BS (
-        base_dir = paste0 (sdir_results_base, "/s10_imp_no3D/final/ranksvm_slacktype=on_pairs/"),
+        base_dir = paste0 (sdir_results_base, "/s10_imp_no3D/final_ECCB2018_paper/ranksvm_slacktype=on_pairs/"),
         predictor = "maccsCount_f2dcf0b3", kernel = "minmax", 
         predictor_column = NULL, kernel_column = NULL,
         pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
@@ -351,7 +351,7 @@ for (D in D_space) {
 df_top1acc_FINAL_imp <- data.table()
 for (D in D_space) {
     tmp <- load_topkacc_of_reranked_molecules_GS_BS (
-        base_dir = paste0 (sdir_results_base, "/s10_imp_no3D/final/ranksvm_slacktype=on_pairs/"),
+        base_dir = paste0 (sdir_results_base, "/s10_imp_no3D/final_ECCB2018_paper/ranksvm_slacktype=on_pairs/"),
         predictor = "maccsCount_f2dcf0b3", kernel = "minmax", 
         predictor_column = NULL, kernel_column = NULL,
         pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
@@ -370,7 +370,7 @@ for (D in D_space) {
 df_top1acc_FINAL_s10 <- data.table()
 for (D in D_space) {
     tmp <- load_topkacc_of_reranked_molecules_GS_BS (
-        base_dir = paste0 (sdir_results_base, "/PredRet/v2/final/ranksvm_slacktype=on_pairs/"),
+        base_dir = paste0 (sdir_results_base, "/PredRet/v2/final_ECCB2018_paper/ranksvm_slacktype=on_pairs/"),
         predictor = "maccsCount_f2dcf0b3", kernel = "minmax", 
         predictor_column = NULL, kernel_column = NULL,
         pair_params = list (allow_overlap = "True", d_lower = 0, d_upper = 16,
