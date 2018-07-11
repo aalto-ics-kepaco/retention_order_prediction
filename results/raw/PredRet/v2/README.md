@@ -51,4 +51,9 @@ to calculate the test-score for each hyper-parameter (see also [documentation](s
 }
 ```
 
-Parameters 
+Parameters configuring the RankSVM:
+- [```pair_params```](src/model_selection_cls.py#L230):
+    - _ireverse_: If true, cross chromatographic-system elution transitivity pairs are used for training. (in paper = false)
+    - _allow_overlap_: If true, contradicting elution order pairs from different systems are included in the training. (in paper = true)
+    - _d_upper_: Scalar, maximum retention order difference of two molecules from one systems to be considered as training pair. (in paper = 16) 
+    - _d_lower_: Scalar, minimum retention order difference of two molecules from one systems to be considered as training pair. (in paper = 0) 
