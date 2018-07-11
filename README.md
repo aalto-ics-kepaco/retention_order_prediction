@@ -21,7 +21,7 @@ Code has only be tested with python 3.5 and 3.6.
 All experiments of the paper can be reproduced by using the calling the [evaluation_scenarios_main.py](src/evaluation_scenarios_main.py)
 script with the proper parameters:
 
-```bash
+```
 usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <PATH/TO/CONFIG.JSON> <NJOBS> <DEBUG>
   ESTIMATOR:           {'ranksvm', 'svr'}, which order predictor to use.
   SCENARIO:            {'baseline', 'baseline_single', 'baseline_single_perc', 'all_on_one', 'all_on_one_perc', 'met_ident_perf_GS_BS'}, which experiment to run.
@@ -37,6 +37,7 @@ usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <P
 | [```baseline_single```](src/evaluation_scenarios_main.py#L708) | Single system used as training and target | Table 3, Table 4 (first two columns) |
 | [```baseline_single_perc```](src/evaluation_scenarios_main.py#L737) | Single system used as training and target. Different percentage of data used for trainging. | Figure 4 (stroked lines) |
 | [```all_on_one```](src/evaluation_scenarios_main.py#L615) | All systems used for training. Single system used as target. Target system in training (LTSO): True & False | Table 4, LTSO = True 3. & 4. column, LTSO = False 5. & 6. column |
+| [```all_on_one_perc```](src/evaluation_scenarios_main.py#L662) | All systems used for training. Single system used as target. Varying percentage of target system data used for training | Figure 4 (solid lines) |
 
 ## Example: Reproducing results shown in Table 3:
 
@@ -44,7 +45,7 @@ The following function calls are need:
 
 __MACCS counting fingerprints:__
 
-```bash
+```
 python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
 ```
 
@@ -95,7 +96,7 @@ becomes
 
 Then run:
 
-```bash
+```
 python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
 ```
 
