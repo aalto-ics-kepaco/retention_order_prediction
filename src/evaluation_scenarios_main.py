@@ -67,7 +67,7 @@ def parse_sysargs (arguments):
 
     :return: parsed parameters
     """
-    if len (arguments) == 1:
+    if len (arguments) < 8:
         print ("usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> "
                "<TSYSIDX> <PATH/TO/CONFIG.JSON> <NJOBS> <DEBUG>\n"
                "  ESTIMATOR:           {'ranksvm', 'svr'}, which order predictor to use.\n"
@@ -776,7 +776,7 @@ if __name__ == "__main__":
 
     elif scenario == "met_ident_perf_GS_BS": # GS_BS means simple grid-search with boot-strapping
         if estimator == "svr":
-            raise NotImplementedError ("Support Vector Regression is currently supported "
+            raise NotImplementedError ("Support Vector Regression is currently not supported "
                                        "for the metabolite identification experiments. "
                                        "However, the required modifications are very little.")
 
