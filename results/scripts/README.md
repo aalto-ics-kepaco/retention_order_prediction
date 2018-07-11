@@ -1,6 +1,6 @@
-# Script to analyse the results
+# Scripts to analyse the results
 
-## ```ECCB2018.Rmd```
+## ```ECCB2018.Rmd```: Reproduce figures and tables from the paper
 
 R-Markdown that produces all the Tables and Figures presented in the paper.
 (Re-)compilation of the [HTML report](../ECCB2018.html) containing the paper results:
@@ -9,11 +9,13 @@ R-Markdown that produces all the Tables and Figures presented in the paper.
 R -e "rmarkdown::render('ECCB2018.Rmd',output_file='../ECCB2018.html')"
 ```
 
-## ```helper.R```
+## ```helper.R```: Load results in to R
 
 Set of functions that allows to load the results of the experiments into R [```data.table```](https://cran.r-project.org/web/packages/data.table/)s.
 
 ### Example 
+
+#### Load results
 
 Load the results of the experiment evaluating the __pairwise prediction__ (```"accuracy"```)
 performance using __RankSVM__ (```"ranksvm_slacktype=on_pairs"```) when trained 
@@ -22,7 +24,7 @@ on a single system and applied to a single target system:
 ```R
 sdir_results <- "results/raw/PredRet/v2/final/" # example when dataset PredRet/v2 is used
 
-load_baseline_single_results (
+res <- load_baseline_single_results (
     measure = c("accuracy", "accuracy_std"), 
     base_dir = paste0 (sdir_results, "ranksvm_slacktype=on_pairs/"),
     predictor = "maccs",
@@ -35,8 +37,8 @@ load_baseline_single_results (
 Parameters:
 - ```measure```: Which evaluation measure to load, e.g., accuracy, correlation, ... (see also: [evaluation_scenarios_cls.py](src/evaluation_scenarios_cls.py#L464))
 - ```base_dir```: Directory of the processed input data of a certain dataset, e.g. ```PredRet/v2```
-  - For RankSVM this paramter is set to [```paste0 (sdir_results, "ranksvm_slacktype=on_pairs/")```](results/raw/PredRet/v2/final/ranksvm_slacktype=on_pairs)
-  - For SVR this parameter is set to [```paste0 (sdir_results, "svr/")```](results/raw/PredRet/v2/final/svr)
+  - For RankSVM this paramter is set to [```paste0 (sdir_results, "ranksvm_slacktype=on_pairs/")```](results/raw/PredRet/v2/final_ECCB2018_paper/ranksvm_slacktype=on_pairs)
+  - For SVR this parameter is set to [```paste0 (sdir_results, "svr/")```](results/raw/PredRet/v2/final_ECCB2018_paper/svr)
   - If the evaluation script is run in _debug_ mode, than replace ```final``` by ```debug```.
 - ```predictor```: Which feature was used to represent the molecules, e.g., MACCS fingerprints.
 - ```kernel```: Which kernel was used on top of the molecular features, e.g., Tanimoto kernel.
@@ -54,3 +56,16 @@ Parameters:
 The different experiments evaluated in the paper require different [```load_*```](helper.R#L246)
 functions. Those are provided in the [helper.R](helper.R) script. Further examples
 how to load the results can be found in the report / summary [R-markdown script](ECCB2018.Rmd).
+
+#### Access results
+
+```R
+> res[d_lower == 0 & d_upper == Inf]
+
+    accuracy accuracy_std           target           source d_lower d_upper
+ 1:   0.8439       0.0053 Eawag_XBridgeC18 Eawag_XBridgeC18       0     Inf
+ 2:   0.9048       0.0075         FEM_long         FEM_long       0     Inf
+ 3:   0.8623       0.0173         LIFE_old         LIFE_old       0     Inf
+ 4:   0.8484       0.0083            RIKEN            RIKEN       0     Inf
+ 5:   0.8019       0.0086   UFZ_Phenomenex   UFZ_Phenomenex       0     Inf
+````
