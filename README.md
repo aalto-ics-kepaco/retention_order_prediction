@@ -32,8 +32,10 @@ usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <P
   DEBUG:               {True, False}, should we run a smoke test.
 ```
 
-| SCENARIO | Description | Reference in the Paper |
-| -------- | ----------- | ---------------------- |
+| __SCENARIO__ | __Description__ | __Reference in the Paper__ |
+| ------------ | --------------- | -------------------------- |
+| [```baseline_single```](src/evaluation_scenarios_main.py#L708) | Single system used as training and target | Table 3, Table 4 (first two columns) |
+| [```baseline_single_perc```](src/evaluation_scenarios_main.py#L737) | Single system used as training and target. Different percentage of data used for trainging. | Figure 4 (stroked lines) |
 
 ## Example: Reproducing results shown in Table 3:
 
