@@ -29,13 +29,17 @@ has been tested with Python 3.5 and 3.6. The following packages are required:
 
 The data pre-processing scripts as well as the script to reproduce the results 
 shown in the paper are written in R. For the development R version 3.4 was used. 
-Teh following packages are required:
+The following packages are required:
 
-- data.table
-- Matrix
-- [obabel2R](https://rdrr.io/github/stanstrup/obabel2R/)
-- [rcdk](https://github.com/rajarshi/cdkr) (used for [fingerprint calculation](data/processed/README.md#fingerprint-calculation))
-- fingerprint
+- Reproduction of results: [ECCB2018.Rmd](results/scripts/ECCB2018.Rmd)
+    - data.table 
+    - ggplot2 
+    - knitr 
+- Reproduction of data pre-processing:
+    - Matrix
+    - [obabel2R](https://rdrr.io/github/stanstrup/obabel2R/)
+    - [rcdk](https://github.com/rajarshi/cdkr) (used for [fingerprint calculation](data/processed/README.md#fingerprint-calculation))
+    - fingerprint
 
 Furthermore, the [OpenBabel](http://openbabel.org/wiki/Main_Page) (>= 2.3.2) 
 command line tool ```obabel``` must be installed __only if__ the data 
