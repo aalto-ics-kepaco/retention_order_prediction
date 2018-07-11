@@ -14,7 +14,7 @@ consider five chromatographic systems (can be though of as sub(data)sets), i.e.,
 and ```"LIFE_old"```. Each of this system can serve as _target system_ for the 
 analysis, i.e, it is the system in which the performence is evaluated, and the 
 corresponding performance measures are stored for each target system separetly 
-([Click here for an example output.](results/raw/PredRet/v2/final/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccs/tanimoto/baseline_single)):
+([Click here for an example output.](results/raw/PredRet/v2/final_ECCB2018_paper/ranksvm_slacktype=on_pairs/allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph/difference/maccs/tanimoto/baseline_single)):
 
 - ```00_accuracies_allpairsfortest=False_featurescaler=noscaling_sysset=10.csv```
 - ```01_accuracies_allpairsfortest=False_featurescaler=noscaling_sysset=10.csv```,
