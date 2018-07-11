@@ -52,8 +52,23 @@ to calculate the test-score for each hyper-parameter (see also [documentation](s
 ```
 
 Parameters configuring the RankSVM:
+
 - [```pair_params```](src/model_selection_cls.py#L230):
     - _ireverse_: If true, cross chromatographic-system elution transitivity pairs are used for training. (in paper = false)
     - _allow_overlap_: If true, contradicting elution order pairs from different systems are included in the training. (in paper = true)
-    - _d_upper_: Scalar, maximum retention order difference of two molecules from one systems to be considered as training pair. (in paper = 16) 
-    - _d_lower_: Scalar, minimum retention order difference of two molecules from one systems to be considered as training pair. (in paper = 0) 
+    - _d_upper_: Scalar, maximum retention order difference of two molecules from one systems to be considered as __training pair__. (in paper = 16) 
+    - _d_lower_: Scalar, minimum retention order difference of two molecules from one systems to be considered as __training pair__. (in paper = 0) 
+- ```feature_type```: Feature type used for the RankSVM. In the paper we use ```difference``` which means: \phi_j - \phi_i. 
+- ```slack_type```: In the paper we use a slack-variable for training pair (= ```on_pairs```).
+
+Some remarks regarding _d_upper_ and _d_lower_: This two paramter are only effecting 
+which and especially how many training pairs are used for the RankSVM. If _d_lower_ 
+is set to 0, than no restrictions are made to the minimum elution order distance. 
+If _d_upper_ is less then Infinity, than this means, that we use for example only 
+pairs of molecular structure, where are not more than 15 molecules eluting between 
+them. So this includes elution order distance 0, 1, 2, ..., 15. We have found out
+that including more pairs does not increase the performence. This could be explaint 
+by the fact, that far apart eluting molecules are easier to distinguish the nearly,
+i.e. molecules with small retention time difference, molecules. Please read the
+source code of the function [```get_pairs_single_system```](src/rank_svm_cls.py#L300)
+for the most simple realisation of such a filtering.
