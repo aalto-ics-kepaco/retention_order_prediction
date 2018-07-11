@@ -1,7 +1,7 @@
 # Experiment settings
 
-The settings, e.g. kernel and molecular features, of an experiment are set in a 
-[json-file](https://en.wikipedia.org/wiki/JSON).
+The model, data and feature parameters for different experimental settings are 
+summarized in json-files, that are specific to each data set, e.g. _results/raw/PredRet/v2/\*.json_).
 
 ## ```"data"```
 
@@ -25,3 +25,16 @@ not used for training if they are also in the test set of the (current) target
 system: ```"excl_mol_by_struct_only": true```. 
 
 ## ```"model"```
+
+```json
+    "modelselection": {
+      "all_pairs_for_test": true
+    }
+```
+
+Parameters configuring the model selection implemented in [model_selection_cls.py](src/model_selection_cls.py). 
+```all_pairs_for_test: true``` means that all available test pairs should be generated
+to calculate the test-score for each hyper-parameter (see)
+
+#### Case: Ranking SVM (```"ranksvm"```)
+
