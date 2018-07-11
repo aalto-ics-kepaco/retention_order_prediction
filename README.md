@@ -19,7 +19,7 @@ Code has only be tested with python 3.5 and 3.6.
 # Usage
 
 All experiments of the paper can be reproduced by using the calling the [evaluation_scenarios_main.py](src/evaluation_scenarios_main.py)
-script with the propper paramters:
+script with the proper parameters:
 
 ```bash
 usage: evaluation_scenarios_main.py <ESTIMATOR> <SCENARIO> <SYSSET> <TSYSIDX> <PATH/TO/CONFIG.JSON> <NJOBS> <DEBUG>
@@ -47,6 +47,19 @@ python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/ra
 - [```results/raw/PredRet/v2/config.json```](results/raw/PredRet/v2/config.json): Configuration of the experiment, e.g. [molecular features and kernels](results/raw/PredRet/v2/config.json#L28).
 - ```2```: Number of jobs/cpus used for the [hyper-parameter search](src/model_selection_cls.py#L370).
 - ```False```: Not running in debug-mode. Results will be stored in the [final](results/raw/PredRet/v2/final) directory.
+
+The results will be stored into: 
+
+```
+results/PredRet/v2
+                └── final
+                    └── ranksvm_slacktype=on_pairs
+                        └── allow_overlap=True_d_lower=0_d_upper=16_ireverse=False_type=order_graph
+                            └── difference
+                                └── maccs
+                                    └── tanimoto
+                                        └── baseline_single
+```
 
 __MACCS binary fingerprints:__
 
