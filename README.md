@@ -41,6 +41,8 @@ MACCS counting fingerprints:
 python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/raw/PredRet/v2/config.json 2 False
 ```
 
-- ```baseline_single```: Single system used for training and testing ([code](src/evaluation_scenarios_main.py#L708)).
+- [```baseline_single```](src/evaluation_scenarios_main.py#L708): Single system used for training and testing.
+- [```10```](results/raw/PredRet/v2/config.json#L7): Use "Eawag_XBridgeC18", "FEM_long", "RIKEN", "UFZ_Phenomenex", "LIFE_old" for training and testing.
+- ```-1```: By setting TSYSIDX to -1, we run all target systems in a single job. [This parameter can be used for parallelization](results/scripts/makefiles#combining-evaluation-results-from-parallel-runs).
 
 # Citation
