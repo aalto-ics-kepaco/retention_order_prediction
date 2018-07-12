@@ -1,10 +1,10 @@
 # Overview
 
-Scripts used to run the experiment presented in the paper:
+Scripts used to run the experiments presented in the paper:
 
-"Liquid-Chromatography Retention Order Prediction for Metabolite Identification"
+__"Liquid-Chromatography Retention Order Prediction for Metabolite Identification"__,
 
-by Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu
+_Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu_, 2018
 
 [Summary of the results](results/ECCB2018.html) shown in the paper (File needs
 to be downloaded and opened with a web-browser.). 
@@ -12,12 +12,13 @@ to be downloaded and opened with a web-browser.).
 # Installation
 
 There is no further installation required. The scripts run out of the box, if 
-all the package dependencies are sattisfied. 
+all the package dependencies are sattisfied. All the __source code__ in this repository
+is under [the MIT License](LICENSE.txt).
 
 ## Order prediction and evaluation code
 
-The order predictor and evaluation scripts are implemented in Python. The code 
-has been tested with Python 3.5 and 3.6. The following packages are required:
+The [order predictor, e.g. RankSVM, and evaluation scripts are implemented in Python](src/). 
+The code has been tested with Python 3.5 and 3.6. The following packages are required:
 
 - scipy >= 0.19.1
 - json >= 2.0.9
@@ -30,7 +31,7 @@ has been tested with Python 3.5 and 3.6. The following packages are required:
 
 ## Data pre-processing and evaluation report creation
 
-The data pre-processing scripts as well as the script to reproduce the results 
+The data [pre-processing scripts](data/scripts) as well as the [script to reproduce the results](results/scripts)
 shown in the paper are written in R. For the development R version 3.4 was used. 
 The following packages are required:
 
@@ -148,3 +149,4 @@ results/PredRet/v2
 How the results can be loaded and visualized is described [here](results/scripts/README.md#helperr-load-results-in-to-r).
 
 # Citation
+
