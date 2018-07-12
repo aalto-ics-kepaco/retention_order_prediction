@@ -150,3 +150,13 @@ How the results can be loaded and visualized is described [here](results/scripts
 
 # Citation
 
+To refer the original publication please use:
+
+```bibtex
+@Article{Bach2018,
+  Title                    = {Liquid-Chromatography Retention Order Prediction for Metabolite Identification},
+  Author                   = {Bach, Eric and Szedmak, Sandor and Brouard, C{\'e}line and Böcker, Sebastian and Rousu, Juho},
+  Year                     = {2018},
+  Url                      = {https://version.aalto.fi/gitlab/bache1/retention_order_prediction}
+}
+```
