@@ -9,6 +9,12 @@ _Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu_, 2
 [Summary of the results](results/ECCB2018.html) shown in the paper (File needs
 to be downloaded and opened with a web-browser.). 
 
+## TODO:
+
+### Documentation of the repository
+
+- Add description how to use the MACCS counting FPS using the modified CDK.
+
 # Installation
 
 There is no further installation required. The scripts run out of the box, if 
