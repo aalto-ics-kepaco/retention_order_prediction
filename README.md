@@ -14,6 +14,7 @@ to be downloaded and opened with a web-browser.).
 ### Documentation of the repository
 
 - Add description how to use the MACCS counting FPS using the modified CDK.
+- Update citation.
 
 # Installation
 
