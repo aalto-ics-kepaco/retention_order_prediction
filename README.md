@@ -48,7 +48,7 @@ The following packages are required:
     - knitr 
 - Reproduction of data pre-processing:
     - Matrix
-    - [obabel2R](https://rdrr.io/github/stanstrup/obabel2R/)
+    - [obabel2R](https://gitlab.com/R_packages/obabel2R)
     - [rcdk](https://github.com/rajarshi/cdkr) (used for [fingerprint calculation](data/processed/README.md#fingerprint-calculation))
     - fingerprint
 
