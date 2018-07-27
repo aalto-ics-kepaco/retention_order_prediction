@@ -44,9 +44,10 @@ library (ggplot2)
 library (data.table)
 library (knitr)
 
-base_dir <- "~/Documents/studies/doctoral/projects/rt_prediction_ranksvm/method_publishing/"
+base_dir <- "~/Documents/doctoral/projects/rt_prediction_ranksvm/method_publishing/"
 
 source (paste (base_dir, "results/scripts/helper.R", sep = "/"))
+source (paste (base_dir, "results/scripts/ttest2.R", sep = "/"))
 
 # Pre-processed retention time data
 sdir <- paste (base_dir, "data/processed/PredRet/v2/", sep = "/")
@@ -104,6 +105,24 @@ ggplot (df_acc_3_1_3[d_lower == 0 & d_upper == Inf],
 kable (df_acc_3_1_3[d_lower == 0 & d_upper == Inf, 
                  .(target_system = target, pairwise_accuracy = round (accuracy, 3), 
                    pairwise_accuracy_2std = round (2 * accuracy_std, 3), predictor)])
+```
+
+```{r, echo = FALSE, eval = FALSE}
+# Test, null hypothesis: maccsCount and maccsBinary perform equally good 
+for (ts in unique(df_acc_3_1_3$target)) {
+    sig <- t.test2(
+        m1 = df_acc_3_1_3[
+            d_lower == 0 & d_upper == Inf & target == ts & predictor == "maccs"]$accuracy,
+        m2 = df_acc_3_1_3[
+            d_lower == 0 & d_upper == Inf & target == ts & predictor == "maccsCount_f2dcf0b3"]$accuracy,
+        s1 = df_acc_3_1_3[
+            d_lower == 0 & d_upper == Inf & target == ts & predictor == "maccs"]$accuracy_std,
+        s2 = df_acc_3_1_3[
+            d_lower == 0 & d_upper == Inf & target == ts & predictor == "maccsCount_f2dcf0b3"]$accuracy_std,
+        n1 = 10, n2 = 10)
+    print (ts)
+    print (sig)
+}
 ```
 
 The following results are based on MACCS counting fingerprints.
@@ -313,6 +332,25 @@ kable (rbind (
                 pairwise_accuracy = round (accuracy, 3),
                 pairwise_accuracy_2std = round (2 * accuracy_std, 3),
                 estimator, perc = 0)]))
+```
+
+```{r, echo = FALSE, eval = FALSE}
+# Test, null hypothesis: RankSVM trained on single system and multiple systems
+# performs equally good.
+for (ts in unique(bl_rsvm_p$target)) {
+    sig <- t.test2(
+        m1 = bl_rsvm_p[
+            target == ts & d_lower == 0 & d_upper == Inf & perc == 100]$accuracy, 
+        m2 = aoo_rsvm_p[
+            target == ts & d_lower == 0 & d_upper == Inf & perc == 100 & embso == TRUE]$accuracy,
+        s1 = bl_rsvm_p[
+            target == ts & d_lower == 0 & d_upper == Inf & perc == 100]$accuracy_std,
+        s2 = aoo_rsvm_p[
+            target == ts & d_lower == 0 & d_upper == Inf & perc == 100 & embso == TRUE]$accuracy_std,
+        n1 = 10, n2 = 10)
+    print (ts)
+    print (sig)
+}
 ```
 
 # Experimental results: Metabolite identification (Section 3.2)
