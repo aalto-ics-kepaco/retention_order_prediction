@@ -1,0 +1,62 @@
+---
+title: "Additional plots for the ECCB2018 presentation"
+output: html_notebook
+---
+
+```{r, eval = FALSE, echo = FALSE}
+####
+#
+# The MIT License (MIT)
+#
+# Copyright 2018 Eric Bach <eric.bach@aalto.fi>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy 
+# of this software and associated documentation files (the "Software"), to deal 
+# in the Software without restriction, including without limitation the rights 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom the Software is furnished
+# to do so, subject to the following conditions:
+#    
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+####
+```
+
+```{r setup, include = FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library (ggplot2)
+library (data.table)
+library (knitr)
+
+base_dir <- "~/Documents/doctoral/projects/rt_prediction_ranksvm/method_publishing/"
+
+source (paste (base_dir, "results/scripts/helper.R", sep = "/"))
+source (paste (base_dir, "results/scripts/ttest2.R", sep = "/"))
+
+# Pre-processed retention time data
+sdir <- paste (base_dir, "data/processed/PredRet/v2/", sep = "/")
+# Directory to store the plots
+odir <- paste (base_dir, "presentation/images/", sep = "/")
+```
+
+```{r, echo = FALSE}
+rts <- data.table (read.csv (paste0 (sdir, "/rts.csv")), stringsAsFactors = FALSE)
+rts <- rts[system %in% c("Eawag_XBridgeC18", "FEM_long", "LIFE_old", "RIKEN", "UFZ_Phenomenex")]
+```
+
+# Rank-correlation of the retention times of different chromatographic systems
+
+```{r}
+rtcor <- get_pairwise_correlation(rts, with_self_correlation = FALSE, min_n_inter = 5, with_both_directions = TRUE)
+plot_pairwise_correlation(rtcor)
+```
+

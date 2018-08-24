@@ -356,3 +356,161 @@ load_baseline_simple_statistics <- function (...)
 {
     return (load_simple_statistics (scenario = "baseline", ...))
 }
+
+get_pairwise_correlation <- function (
+    db, with_self_correlation = TRUE, rm_na = FALSE, with_both_directions = FALSE,
+    same_mol_based_on = "inchi", system_id_col_str = "system", rt_col_str = "rt",
+    min_n_inter = 5)
+{
+    # Create pairs of systems
+    system_ids <- sort (unique (db[[system_id_col_str]]))
+    system_pairs <- t(combn (system_ids, 2))
+    system_pairs <- data.table (
+        A = factor (system_pairs[, 1], levels = system_ids),
+        B = factor (system_pairs[, 2], levels = system_ids))
+    
+    # Calculate rank-correlations and number of shared molecules
+    df <- t(apply (system_pairs, MARGIN = 1, FUN = function (pair) {
+        db_pair_merged <- merge (db[get(system_id_col_str) %in% pair[1]],
+                                 db[get(system_id_col_str) %in% pair[2]],
+                                 by = same_mol_based_on)
+        n_inter <- nrow (db_pair_merged)
+        
+        # If the intersection is to small no rank-correlation can be
+        # calculated
+        if (n_inter >= min_n_inter) {
+            rank_corr  <- cor (db_pair_merged[[paste0 (rt_col_str, ".x")]],
+                               db_pair_merged[[paste0 (rt_col_str, ".y")]],
+                               method = "kendall")
+            spear_corr <- cor (db_pair_merged[[paste0 (rt_col_str, ".x")]], 
+                               db_pair_merged[[paste0 (rt_col_str, ".y")]],
+                               method = "spearman")
+            pears_corr <- cor (db_pair_merged[[paste0 (rt_col_str, ".x")]], 
+                               db_pair_merged[[paste0 (rt_col_str, ".y")]],
+                               method = "pearson")
+        } else {
+            rank_corr  <- NA
+            spear_corr <- NA
+            pears_corr <- NA
+        }
+        
+        return (c(rank_corr, spear_corr, pears_corr, n_inter))
+    }))
+    
+    pairwise_corr <- data.table (
+        from = system_pairs$A, to = system_pairs$B,
+        rank_corr = df[, 1], spear_corr = df[, 2], pears_corr = df[, 3], n_inter = df[, 4])
+    
+    if (with_both_directions) {
+        pairwise_corr <- rbind (
+            pairwise_corr,
+            data.table (
+                from = system_pairs$B, to = system_pairs$A,
+                rank_corr = df[, 1], spear_corr = df[, 2], 
+                pears_corr = df[, 3], n_inter = df[, 4])
+        )
+    }
+    
+    if (rm_na) {
+        pairwise_corr <- pairwise_corr[! is.na (pairwise_corr$rank_corr)]
+    }
+    
+    # Add systems self-correlation
+    if (with_self_correlation) {
+        pairwise_corr <- rbind (
+            pairwise_corr, 
+            db[, list (to = unique (get(system_id_col_str)),
+                       rank_corr = cor (get(rt_col_str), get(rt_col_str), 
+                                        method = "kendall"),
+                       spear_corr = cor (get(rt_col_str), get(rt_col_str),
+                                         method = "spearman"),
+                       pears_corr = cor (get(rt_col_str), get(rt_col_str),
+                                         method = "pearson"),
+                       n_inter = .N),
+               keyby = .(from = get(system_id_col_str))])
+    }
+    
+    return (pairwise_corr)
+}
+
+#' Plot the pairwise correlation between CSs. These correlations are calcualted
+#' based on the retention-times of molecules measured with both (pairwise) CSs.
+#' 
+#' @param pairwise_corr data.table, containing the pairwise correlations of 
+#'                      different CSs. 
+#' @param measure string, which correlation should be used for plotting:
+#'                - "kendall": Kendall's Tau rank correlation
+#'                - "spearman": Spearmans correlation
+#' @param label string, which information should be plotted in the cells:
+#'              - "measure": correlation chosen by @param measure
+#'              - "n_inter": number of molecules in the intersection
+#' @param filename string, filename of the output-file to save the plot. The 
+#'                 default value is 'NULL' which means, that a ggplot2 object
+#'                 is returned and nothing is written to a file.
+#'                 (default = 'NULL')
+#' @param filepath string, path to the output-directory to store the plot.
+#'                 (default = 'NULL')
+#' @param form_str string, columnname containing the source systems, columns
+#'                 (default = "from")
+#' @param to_str string, columnname containing the target systems, rows 
+#'               (default = "to")
+#'                 
+#' @return ggplot2 object if @param filepath or @param filename is.null.
+#'                      
+#' @seealso get_pairwise_correlation
+plot_pairwise_correlation <- function (
+    pairwise_corr, measure = "kendall", label = "measure", filename = NULL, 
+    filepath = NULL, from_str = "from", to_str = "to", bold_text_if = NULL, 
+    border_cell_if = NULL, label_rounding_digits = 3) 
+{
+    stopifnot (measure %in% c("kendall", "spearman", "accuracy", "accuracy_w"))
+    
+    if (is.null (bold_text_if)) {
+        pairwise_corr$fontface <- "plain"
+    } 
+    else {
+        pairwise_corr$fontface <- ifelse (pairwise_corr[[bold_text_if]],
+                                          "bold", "plain")
+    }
+    
+    pairwise_corr[[from_str]] <- factor (pairwise_corr[[from_str]])
+    pairwise_corr[[to_str]] <- factor (pairwise_corr[[to_str]])
+    
+    measure_type_str <- switch (
+        measure, "kendall" = "rank_corr", "spearman" = "spear_corr",
+        "accuracy" = "accuracy", "accuracy_w" = "accuracy_w")
+    cmidpoint <- switch (measure, "kendall" =, "spearman" = 0, "accuracy" =, "accuracy_w" = 0.5)
+    
+    p <- ggplot (pairwise_corr, aes(x = get (from_str), y = get (to_str))) +
+        geom_raster (aes (fill  = get (measure_type_str),
+                          alpha = ifelse (is.na (get (measure_type_str)), 0, 1))) +
+        geom_text (aes (label = switch (label, 
+                                        measure = round (get (measure_type_str), label_rounding_digits), 
+                                        n_inter = n_inter),
+                        fontface = fontface), size = 3.0) +
+        scale_alpha_continuous (range = c(0, 1), guide = "none") +
+        scale_fill_gradient2 (low  = "red", mid  = "white", high = "blue",
+                              name = measure, midpoint = cmidpoint) +
+        labs (x = NULL, y = NULL, title = NULL) +
+        theme (axis.text.x     = element_text (angle = 45, hjust = 1),
+               legend.position = "right")
+    
+    
+    if (! is.null (border_cell_if)) {
+        pairwise_corr$with_border <- pairwise_corr[[border_cell_if]]
+        p <- p + geom_rect (aes (xmin  = as.numeric (get (from_str)) - 0.5, xmax = as.numeric (get (from_str)) + 0.5,
+                                 ymin  = as.numeric (get (to_str)) - 0.5, ymax = as.numeric (get (to_str)) + 0.5),
+                            alpha = 0, color = ifelse (pairwise_corr$with_border, "black", NA), size = 0.5)
+    }
+    
+    if ("setting" %in% colnames (pairwise_corr)) {
+        p <- p + facet_wrap (~ setting, ncol = 3, scales = "free")
+    }
+    
+    if (! any (is.null(filename), is.null (filepath))) {
+        ggsave (filename = filename, path = filepath,
+                width = 15, height = 9)
+    }
+    
+    return (p)
+}
