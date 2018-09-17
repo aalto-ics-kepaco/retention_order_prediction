@@ -1,8 +1,6 @@
 For some candidates not all the fingerprints could be calculated. We therefore remove
 those candidates from the candidate lists / scoring files. This is done using the 
-script: 
-
-  - **data/scripts/R/clean_up_impact_candidate_lists.R**
+script: [```clean_up_impact_candidate_lists.R```](data/scripts/clean_up_impact_candidate_lists.R) 
 
 The scoring files, that needed to be modifed, i.e. examples have been removed, are
 in the subdirectory **before_clean_up/**. 
