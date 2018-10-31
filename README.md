@@ -14,7 +14,6 @@ to be downloaded and opened with a web-browser.).
 ### Documentation of the repository
 
 - Add description how to use the MACCS counting FPS using the modified CDK.
-- Update citation.
 
 # Installation
 
@@ -160,10 +159,16 @@ How the results can be loaded and visualized is described [here](results/scripts
 To refer the original publication please use:
 
 ```bibtex
-@Article{Bach2018,
-  Title                    = {Liquid-Chromatography Retention Order Prediction for Metabolite Identification},
-  Author                   = {Bach, Eric and Szedmak, Sandor and Brouard, C{\'e}line and Böcker, Sebastian and Rousu, Juho},
-  Year                     = {2018},
-  Url                      = {https://version.aalto.fi/gitlab/bache1/retention_order_prediction}
+@article{doi:10.1093/bioinformatics/bty590,
+    author  = {Bach, Eric and Szedmak, Sandor and Brouard, Céline and Böcker, Sebastian and Rousu, Juho},
+    title   = {Liquid-chromatography retention order prediction for metabolite identification},
+    journal = {Bioinformatics},
+    volume  = {34},
+    number  = {17},
+    pages   = {i875-i883},
+    year    = {2018},
+    doi     = {10.1093/bioinformatics/bty590},
+    URL     = {http://dx.doi.org/10.1093/bioinformatics/bty590},
+    eprint  = {/oup/backfile/content_public/journal/bioinformatics/34/17/10.1093_bioinformatics_bty590/2/bty590.pdf}
 }
 ```
