@@ -790,8 +790,7 @@ if __name__ == "__main__":
         # Get model filename and check whether it already has been trained:
         model_fn = model_output_dir + "/ranking_model_" + dict2str (param_suffixes, sep = "_") + ".mdl"
 
-        if os.path.isfile (model_fn) and os.path.isfile (training_data_fn) and os.path.isfile (best_params_fn)\
-                and os.path.isfile (kernel_params_fn):
+        if os.path.isfile (model_fn):
             print ("Load ranking model ...")
 
             # 1) Load an existing model
