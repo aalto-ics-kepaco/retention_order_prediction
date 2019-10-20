@@ -7,23 +7,17 @@ __"Liquid-Chromatography Retention Order Prediction for Metabolite Identificatio
 _Eric Bach, Sandor Szedmak, Celine Brouard, Sebastian Böcker and Juho Rousu_, 2018
 
 [Summary of the results](results/ECCB2018.html) shown in the paper (File needs
-to be downloaded and opened with a web-browser.). 
-
-## TODO:
-
-### Documentation of the repository
-
-- Add description how to use the MACCS counting FPS using the modified CDK.
+to be downloaded and opened with a web-browser.).
 
 # Installation
 
-There is no further installation required. The scripts run out of the box, if 
+There is no further installation required. The scripts run out of the box, if
 all the package dependencies are sattisfied. All the __source code__ in this repository
 is under [the MIT License](LICENSE.txt).
 
 ## Order prediction and evaluation code
 
-The [order predictor, e.g. RankSVM, and evaluation scripts are implemented in Python](src/). 
+The [order predictor, e.g. RankSVM, and evaluation scripts are implemented in Python](src/).
 The code has been tested with Python 3.5 and 3.6. The following packages are required:
 
 - scipy >= 0.19.1
@@ -38,22 +32,28 @@ The code has been tested with Python 3.5 and 3.6. The following packages are req
 ## Data pre-processing and evaluation report creation
 
 The data [pre-processing scripts](data/scripts) as well as the [script to reproduce the results](results/scripts)
-shown in the paper are written in R. For the development R version 3.4 was used. 
+shown in the paper are written in R. For the development R version 3.4 was used.
 The following packages are required:
 
 - Reproduction of results: [ECCB2018.Rmd](results/scripts/ECCB2018.Rmd)
-    - data.table 
-    - ggplot2 
-    - knitr 
+    - data.table
+    - ggplot2
+    - knitr
 - Reproduction of data pre-processing:
     - Matrix
     - [obabel2R](https://gitlab.com/R_packages/obabel2R)
     - [rcdk](https://github.com/rajarshi/cdkr) (used for [fingerprint calculation](data/processed/README.md#fingerprint-calculation))
     - fingerprint
 
-Furthermore, the [OpenBabel](http://openbabel.org/wiki/Main_Page) (>= 2.3.2) 
-command line tool ```obabel``` must be installed __only if__ the data 
+Furthermore, the [OpenBabel](http://openbabel.org/wiki/Main_Page) (>= 2.3.2)
+command line tool ```obabel``` must be installed __only if__ the data
 pre-processing needs to be repeated.
+
+### Calculation of MACCS counting fingerprints
+
+The [rcdkTools package](https://github.com/bachi55/rcdkTools) allows the
+computation of several counting fingerprints through the
+[Chemical Development Kit (CDK)](https://cdk.github.io/).  
 
 # Usage
 
@@ -95,7 +95,7 @@ python src/evaluation_scenarios_main.py ranksvm baseline_single 10 -1 results/ra
 - ```2```: Number of jobs/cpus used for the [hyper-parameter search](src/model_selection_cls.py#L370).
 - ```False```: Not running in debug-mode. Results will be stored in the [final](results/raw/PredRet/v2/final) directory.
 
-The results will be stored into: 
+The results will be stored into:
 
 ```
 results/PredRet/v2
