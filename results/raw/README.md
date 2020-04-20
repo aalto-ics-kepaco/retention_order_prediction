@@ -9,8 +9,8 @@ to raw results are available:
 # Experiment settings
 
 The model, data and feature parameters for different experimental settings are 
-summarized in json-files, that are specific to each data set, e.g. [_raw/PredRet/v2/\*.json_](results/raw/PredRet/v2/config.json) 
-and [_results/raw/s10_imp_no3D/\*.json_](results/raw/s10_imp_no3D/config.json).
+summarized in json-files, that are specific to each data set, e.g. [_raw/PredRet/v2/\*.json_](PredRet/v2/config.json) 
+and [_results/raw/s10_imp_no3D/\*.json_](s10_imp_no3D/config.json).
 
 ## ```"data"```
 
