@@ -49,7 +49,7 @@ Parameters:
 - ```flavor```: List of parameters used to identify the some settings during the evaluation:
   - ```allpairsfortest```: See parameter documentation of [```find_hparan_ranksvm```](/src/model_selection_cls.py#L198).
   - ```featurescaler```: Feature scaler used for the molecular features. (see also: [```evaluate_on_target_systems```](/src/evaluation_scenarios_cls.py#L209))
-  - ```sysset```: Which (sub)set of systems from the specified dataset should be used, e.g., [the used in the paper (=10)](/results/raw/PredRet/v2/config_local.json#L7).
+  - ```sysset```: Which (sub)set of systems from the specified dataset should be used, e.g., [the used in the paper (=10)](results/raw/PredRet/v2/config_local.json#L7).
 
 The different experiments evaluated in the paper require different [```load_*```](helper.R#L246)
 functions. Those are provided in the [helper.R](helper.R) script. Further examples
