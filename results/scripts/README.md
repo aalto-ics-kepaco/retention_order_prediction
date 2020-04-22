@@ -33,7 +33,7 @@ res <- load_baseline_single_results (
 ```
 
 Parameters:
-- ```measure```: Which evaluation measure to load, e.g., accuracy, correlation, ... (see also: [evaluation_scenarios_cls.py](src/evaluation_scenarios_cls.py#L464))
+- ```measure```: Which evaluation measure to load, e.g., accuracy, correlation, ... (see also: [evaluation_scenarios_cls.py](/src/evaluation_scenarios_cls.py#L464))
 - ```base_dir```: Directory of the processed input data of a certain dataset, e.g. ```PredRet/v2```
   - For RankSVM this paramter is set to [```paste0 (sdir_results, "ranksvm_slacktype=on_pairs/")```](/results/raw/PredRet/v2/final_ECCB2018_paper/ranksvm_slacktype=on_pairs)
   - For SVR this parameter is set to [```paste0 (sdir_results, "svr/")```](/results/raw/PredRet/v2/final_ECCB2018_paper/svr)
@@ -49,7 +49,7 @@ Parameters:
 - ```flavor```: List of parameters used to identify the some settings during the evaluation:
   - ```allpairsfortest```: See parameter documentation of [```find_hparan_ranksvm```](/src/model_selection_cls.py#L198).
   - ```featurescaler```: Feature scaler used for the molecular features. (see also: [```evaluate_on_target_systems```](/src/evaluation_scenarios_cls.py#L209))
-  - ```sysset```: Which (sub)set of systems from the specified dataset should be used, e.g., [the used in the paper (=10)](results/raw/PredRet/v2/config_local.json#L7).
+  - ```sysset```: Which (sub)set of systems from the specified dataset should be used, e.g., [the used in the paper (=10)](/results/raw/PredRet/v2/config_local.json#L7).
 
 The different experiments evaluated in the paper require different [```load_*```](helper.R#L246)
 functions. Those are provided in the [helper.R](helper.R) script. Further examples
