@@ -57,7 +57,7 @@ computation of several counting fingerprints through the
 
 # Usage
 
-All experiments of the paper can be reproduced by using the calling the [evaluation_scenarios_main.py](src/evaluation_scenarios_main.py)
+All experiments of the paper can be reproduced by using the [evaluation_scenarios_main.py](src/evaluation_scenarios_main.py)
 script with the proper parameters:
 
 ```
