@@ -73,4 +73,4 @@ how to load the results can be found in the report / summary [R-markdown script]
     - ```0``` and ```Inf``` means, that all possible pairs are used for testing (as the paper defines the _Pairwise accuracy_ in Section 3.1.2)
     - The result files also contain other ```d_lower``` and ```d_upper``` pairs.
     - Those can be used to, e.g., evaluate the pairwise prediction accuracy for nearby eluting molecules, i.e. with small retention time difference: ```d_lower = 0``` and ```d_upper = 4```.
-    - Please look at the [source code generating the pairwise accuracies](src/evaluation_scenarios_cls.py#L457).
+    - Please look at the [source code generating the pairwise accuracies](/src/evaluation_scenarios_cls.py#L457).
